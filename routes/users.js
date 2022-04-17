@@ -1,13 +1,13 @@
 
-let bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt")
 
-let { generateAccessToken } = require("../config/main")
-let { Users, Transaction } = require("../model/model");
-
-let Registration = async (req, res) => {
+const { generateAccessToken } = require("../config/main")
+const { Users, Transaction } = require("../model/model");
+const { getToken, decodeToken } = require("../config/main")
+const Registration = async (req, res) => {
 
   try {
-    let data = await new Users(req.body)
+    const data = await new Users(req.body)
 
     Users.findByEmail(data.email, function (err, result) {
       if (err) { res.json({ message: err, status: false }) }
@@ -26,22 +26,22 @@ let Registration = async (req, res) => {
 
   } catch (error) {
 
-    res.json({ message:error, status:false})
+    res.json({ message: error, status: false })
   }
 }
-let Login = async (req, res) => {
+const Login = async (req, res) => {
   try {
-    let { email, password } = req.body
+    const { email, password } = req.body
     Users.findByEmail(email, async function (err, result) {
       if (err) {
         res.json({ message: "bad reruest", status: false })
       }
       else {
         if (result.length > 0) {
-          let match = await bcrypt.compare(password, result[0].password)
+          const match = await bcrypt.compare(password, result[0].password)
           if (match) {
-            let accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
-            res.json({ message: "login successfully done", status: true, token: accessToken,id:result[0].id})
+            const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
+            res.json({ message: "login successfully done", status: true, token: accessToken, id: result[0].id })
           }
           else {
             res.json({ message: "pass not match", status: false })
@@ -57,55 +57,66 @@ let Login = async (req, res) => {
   }
 
 }
-const user = async (req, res) => {
+const transaction = async (req, res) => {
   try {
-    Transaction.findByUserId (req.body.user,async function (err, result) {
-      if (err) {
-        res.send(err)
-      }
-      else {
-        res.send(result)
-      }
-    })
+    const token = await getToken(req)
+    const TokenData = decodeToken(token)
+    // console.log(TokenData.user.userId)
+    if (TokenData) {
+      Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
+        if (err) {
+          res.json({ message: err, status: false })
+        }
+        else {
+          res.send({ data: result, status: true })
+
+        }
+      })
+    }
+
   } catch (error) {
 
   }
 
 }
 
-const transaction = async (req, res) => {
+const createTransaction = async (req, res) => {
 
   try {
-    let data = await new Transaction(req.body)
+    const data = await new Transaction(req.body)
 
     Transaction.add(data, function (err, result) {
       if (err) { res.send({ message: err, status: false }) }
-      res.json({ message: "Transaction successfull", status: true,})
+      res.json({ message: "Transaction successfull", status: true, })
 
     })
 
   } catch (error) {
-  
-    res.json({ message:error, status: false,})
+
+    res.json({ message: error, status: false, })
   }
 }
 
-const serach = async (req,res)=>{
+const getUser = async (req, res) => {
   try {
-    const data =req.body.user
-    Transaction.findByUserId(data,function(err,result){
-      if(err){
-        console.log(err)
-      }
-      res.send(result)
-    })
+    const token = await getToken(req)
+    const TokenData = decodeToken(token)
+    if (TokenData) {
+      Users.findByEmail(TokenData.user.email, function (err, result) {
+        if (err) {
+          console.log(err)
+        }
+        res.send(result)
+      })
+    }
+
   } catch (error) {
-    
+
   }
 }
 
 module.exports = {
-  Registration, Login, user, transaction,serach
+  Registration, Login, transaction, createTransaction, getUser
 }
 
 

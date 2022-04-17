@@ -12,12 +12,11 @@ const { Router } = require('express');
 
 
 router.use(urlencodedParser)
-
-
+router.get("/auth/transaction",auth, user.transaction)
+router.get("/auth/user",auth, user.getUser)
 router.post('/registration', user.Registration)
 router.post("/login", user.Login)
-router.post("/gettransection", user.user)
-router.post("/transection",auth,user.transaction)
+router.post("/auth/transaction",auth,user.createTransaction)
 
 
 
