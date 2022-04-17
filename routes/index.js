@@ -16,7 +16,7 @@ router.use(urlencodedParser)
 
 router.post('/registration', user.Registration)
 router.post("/login", user.Login)
-router.get("/user", user.user)
+router.post("/gettransection", user.user)
 router.post("/transection",auth,user.transaction)
 
 

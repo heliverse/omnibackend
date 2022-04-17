@@ -8,9 +8,7 @@ const session = require('express-session');
 const port =process.env.port
 //middleware
 app.use(cors())
-
 app.set('view engine', 'ejs');
-
 app.use(session({
   resave: false,
   saveUninitialized: true,

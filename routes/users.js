@@ -59,7 +59,7 @@ let Login = async (req, res) => {
 }
 const user = async (req, res) => {
   try {
-    Users.findAll(async function (err, result) {
+    Transaction.findByUserId (req.body.user,async function (err, result) {
       if (err) {
         res.send(err)
       }
@@ -78,7 +78,6 @@ const transaction = async (req, res) => {
   try {
     let data = await new Transaction(req.body)
 
-    console.log(req.body)
     Transaction.add(data, function (err, result) {
       if (err) { res.send({ message: err, status: false }) }
       res.json({ message: "Transaction successfull", status: true,})
@@ -87,7 +86,7 @@ const transaction = async (req, res) => {
 
   } catch (error) {
   
-    res.json({ message:error, status: true,})
+    res.json({ message:error, status: false,})
   }
 }
 
