@@ -5,8 +5,10 @@ let Users = function (user) {
     this.firstname = user.firstname;
     this.lastname = user.lastname;
     this.email = user.email;
-    this.password = user.password,
-        this.balance = 0
+    this.password = user.password;
+    this.balance = 0;
+    this.otp = user.otp;
+    this.status = user.status
 }
 
 let Transaction = function (transaction) {
@@ -16,7 +18,7 @@ let Transaction = function (transaction) {
 }
 Users.create = async (Data, callback) => {
     let password = await generatePassword(Data.password)
-    connection.query('INSERT INTO users (firstname,lastname,email,password,balance) VALUES ($1, $2, $3, $4,$5)', [Data.firstname, Data.lastname, Data.email, password, Data.balance], (error, result) => {
+    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,otp,status) VALUES ($1, $2, $3, $4,$5,$6,$7) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status], (error, result) => {
         if (error) {
             callback(null, error)
         }
@@ -39,6 +41,28 @@ Users.findByEmail = (Email, callback) => {
         }
     })
 
+}
+Users.findByUserId = (Id, callback) => {
+    connection.query("select * from users where (id) = ($1)", [Id], (error, result) => {
+        if (error) {
+            callback(null, error)
+        }
+        else {
+
+            callback(null, result.rows)
+        }
+    })
+
+}
+Users.updateStatus = (Id, callback) => {
+    connection.query("update users set status = ($1) where id = ($2)", [true, Id], (err, result) => {
+        if (err) {
+            callback(err, null)
+        }
+        else {
+            callback(null, result)
+        }
+    })
 }
 Users.update = (callback) => {
 

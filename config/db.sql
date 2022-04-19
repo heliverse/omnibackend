@@ -4,7 +4,9 @@ create db omifi
   firstname VARCHAR(100) NOT NULL,
   lastname VARCHAR(100) NOT NULL,
   password VARCHAR(200), 
-  email  VARCHAR(200) NOT NULL,     
+  email  VARCHAR(200) NOT NULL,
+  otp VARCHAR(100) ,  
+  status  BOOLEAN,
   PRIMARY KEY ( id,email ) );
                  
 

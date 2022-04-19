@@ -3,19 +3,30 @@ const bcrypt = require("bcrypt")
 
 const { generateAccessToken } = require("../config/main")
 const { Users, Transaction } = require("../model/model");
-const { getToken, decodeToken } = require("../config/main")
+const { getToken, decodeToken } = require("../config/main");
+const { SendTestEmail } = require("../config/email");
+function generateOTP() {
+  var digits = '0123456789';
+  let OTP = '';
+  for (let i = 0; i < 4; i++) {
+    OTP += digits[Math.floor(Math.random() * 10)];
+  }
+  return OTP;
+}
 const Registration = async (req, res) => {
 
   try {
-    const data = await new Users(req.body)
-
+    const otp = generateOTP()
+    const data = new Users({ ...req.body, otp, status: false })
     Users.findByEmail(data.email, function (err, result) {
       if (err) { res.json({ message: err, status: false }) }
       else {
         if (result.length > 0) { res.json({ message: "user already exist", status: false }) }
         else {
           Users.create(data, function (err, result) {
-            if (err) { res.send({ message: err, status: false }) }
+            if (err) { return res.send({ message: err, status: false }) }
+            console.log(result, "User registered")
+            SendTestEmail(data.email, otp, result.rows[0].id)
             res.json({ message: "user registration successfull", status: true })
 
           })
@@ -23,6 +34,11 @@ const Registration = async (req, res) => {
       }
 
     })
+    // let emailVer = false
+    // sendTestMail function call
+    // if(emailVer){
+    //   response send kray gay
+    // }
 
   } catch (error) {
 
@@ -38,6 +54,7 @@ const Login = async (req, res) => {
       }
       else {
         if (result.length > 0) {
+          if (result[0].status == false) return res.json({ message: "Please verify your email.", status: false })
           const match = await bcrypt.compare(password, result[0].password)
           if (match) {
             const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
@@ -115,8 +132,27 @@ const getUser = async (req, res) => {
   }
 }
 
+const verifyOtp = async (req, res) => {
+  try {
+    const { id, otp } = req.params
+    Users.findByUserId(id, (err, result) => {
+      if (err) return res.json({ message: err, status: false })
+      if (result.length == 0) return res.json({ message: "User not found", status: false })
+      if (result[0].status == true) return res.json({ message: "User already verified", status: true })
+      if (result[0].otp != otp) return res.json({ message: "Invalid OTP", status: false })
+      Users.updateStatus(id, (err, result) => {
+        if (err) return res.json({ message: "Bad request", status: false })
+        console.log("-------", result, "-------")
+        return res.json({ message: "OTP verified successfully", status: true })
+      })
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 module.exports = {
-  Registration, Login, transaction, createTransaction, getUser
+  Registration, Login, transaction, createTransaction, getUser, verifyOtp
 }
 
 

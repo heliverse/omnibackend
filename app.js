@@ -5,14 +5,14 @@ let cors = require("cors")
 let Router = require('./routes/index');
 let app = express();
 const session = require('express-session');
-const port =process.env.port
+const port = process.env.port
 //middleware
 app.use(cors())
 app.set('view engine', 'ejs');
 app.use(session({
   resave: false,
   saveUninitialized: true,
-  secret: 'SECRET' 
+  secret: 'SECRET'
 }));
 
 app.use("/", Router)
@@ -24,5 +24,5 @@ app.use("/", Router)
 // job.start();
 
 app.listen(port, () => {
-console.log("i m on")
+  console.log("i m on")
 })
