@@ -1,22 +1,29 @@
+var SibApiV3Sdk = require("sib-api-v3-sdk");
 const jwt = require('jsonwebtoken')
 let bcrypt = require("bcrypt")
-const secretKey=process.env.SECRET_KEY
+let defaultClient = SibApiV3Sdk.ApiClient.instance;
+const secretKey = process.env.SECRET_KEY
 const jwtConfig = {
     secret: secretKey,
     refreshTokenSecret: "clsdlwer2524t49rfekfldfsf=sd-sdsv",
-    expireTime: 30*60,
-    refreshTokenExpireTime: 30*60*60
+    expireTime: 30 * 60,
+    refreshTokenExpireTime: 30 * 60 * 60
 }
+
+
+let apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey =
+    "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";
 
 exports.generateAccessToken = (user) => {
-    const payload = {user}
-    const accessToken = jwt.sign(payload,jwtConfig.secret,{expiresIn: jwtConfig.expireTime})
+    const payload = { user }
+    const accessToken = jwt.sign(payload, jwtConfig.secret, { expiresIn: jwtConfig.expireTime })
     return accessToken
 }
-exports.decodeToken =(token)=>{
-const Token = jwt.decode(token,secretKey);
+exports.decodeToken = (token) => {
+    const Token = jwt.decode(token, secretKey);
 
-return Token
+    return Token
 
 }
 
@@ -26,9 +33,9 @@ return Token
 //     return refreshToken
 // }
 
- exports.verifyJWTToken = (token) => {
-     const data = jwt.verify(token,jwtConfig.secret)
-     return data
+exports.verifyJWTToken = (token) => {
+    const data = jwt.verify(token, jwtConfig.secret)
+    return data
 }
 
 // exports.verifyRefreshToken = (token) => {
@@ -36,9 +43,9 @@ return Token
 //     return data
 // }
 
-exports.generatePassword = async (payload)=>{
+exports.generatePassword = async (payload) => {
     let salt = await bcrypt.genSaltSync(10)
-    var password = await bcrypt.hashSync(payload,salt)
+    var password = await bcrypt.hashSync(payload, salt)
     return password
 }
 // let SecurePassword = async(payload,callback)=>{
@@ -54,19 +61,44 @@ exports.generatePassword = async (payload)=>{
 // module.exports={
 //     SecurePassword
 // }
-exports.getToken= async (req)=> {
-    
+exports.getToken = async (req) => {
+
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') { // Authorization: Bearer g1jipjgi1ifjioj
-      // Handle token presented as a Bearer token in the Authorization header
-      return req.headers.authorization.split(' ')[1];
+        // Handle token presented as a Bearer token in the Authorization header
+        return req.headers.authorization.split(' ')[1];
     } else if (req.query && req.query.token) {
-      // Handle token presented as URI param
-      return req.query.token;
+        // Handle token presented as URI param
+        return req.query.token;
     } else if (req.cookies && req.cookies.token) {
-      // Handle token presented as a cookie parameter
-      return req.cookies.token;
+        // Handle token presented as a cookie parameter
+        return req.cookies.token;
     }
     // If we return null, we couldn't find a token.
     // In this case, the JWT middleware will return a 401 (unauthorized) to the client for this request
-    return null; 
-  }
+    return null;
+}
+
+exports.sendEmail = (address, otp, user) => {
+    console.log(address)
+    var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
+    sendSmtpEmail = {
+        sender: { email: "abdul@heliverse.com" },
+        to: [
+            {
+                email: address,
+            },
+        ],
+        subject: "Your One-Time-Password",
+    };
+    sendSmtpEmail.htmlContent = "<html><body><h1>Omnifi</h1>Please click on the below button to verify your email<br><a  href={{params.link}} >Verify Email</a></body></html>";
+    sendSmtpEmail.params = { "otp": otp, link: 'http://localhost:3000/verify-otp/' + user.id + "/" + otp };
+    apiInstance.sendTransacEmail(sendSmtpEmail).then(
+        function (data) {
+            console.log("API called successfully. Returned data: " + data);
+        },
+        function (error) {
+            console.error(error);
+        }
+    );
+}

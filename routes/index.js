@@ -1,25 +1,23 @@
 var express = require('express');
-let user =require("./users")
+let user = require("./users")
 var router = express.Router();
-let bodyParser =require("body-parser");
+let bodyParser = require("body-parser");
 
-let urlencodedParser =bodyParser.urlencoded({extended:false})
+let urlencodedParser = bodyParser.urlencoded({ extended: false })
 router.use(bodyParser.json())
 // /* GET home page. */
 const auth = require("../config/middleware");
 const { Router } = require('express');
-const { SendTestEmail } = require('sib-api-v3-sdk');
 
 
 
 router.use(urlencodedParser)
-router.get("/auth/transaction",auth, user.transaction)
-router.get("/auth/user",auth, user.getUser)
+router.get("/auth/transaction", auth, user.transaction)
+router.get("/auth/user", auth, user.getUser)
 router.post('/registration', user.Registration)
 router.post("/login", user.Login)
-router.post("/auth/transaction",auth,user.createTransaction)
-router.post("/sendEmail",auth,SendTestEmail)
-router.get('/verify-otp/:id/:otp',user.verifyOtp)
+router.post("/auth/transaction", auth, user.createTransaction)
+router.get('/verify-otp/:id/:otp', user.verifyOtp)
 
 
 

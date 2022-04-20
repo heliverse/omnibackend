@@ -1,10 +1,9 @@
 
 const bcrypt = require("bcrypt")
 
-const { generateAccessToken } = require("../config/main")
+const { generateAccessToken, sendEmail } = require("../config/main")
 const { Users, Transaction } = require("../model/model");
 const { getToken, decodeToken } = require("../config/main");
-const { SendTestEmail } = require("../config/email");
 function generateOTP() {
   var digits = '0123456789';
   let OTP = '';
@@ -18,19 +17,16 @@ const Registration = async (req, res) => {
   try {
     const otp = generateOTP()
     const data = new Users({ ...req.body, otp, status: false })
-    Users.findByEmail(data.email, function (err, result) {
+    Users.findByEmail(data.email, async function (err, result) {
       if (err) { res.json({ message: err, status: false }) }
       else {
-        if (result.length > 0) { res.json({ message: "user already exist", status: false }) }
-        else {
-          Users.create(data, function (err, result) {
-            if (err) { return res.send({ message: err, status: false }) }
-            console.log(result, "User registered")
-            SendTestEmail(data.email, otp, result.rows[0].id)
-            res.json({ message: "user registration successfull", status: true })
-
-          })
-        }
+        if (result.length > 0 && result[0].status == true) { return res.json({ message: "user already exist", status: false }) }
+        if (result.length > 0 && result[0].status == false) await Users.delete(data.email)
+        Users.create(data, function (err, result) {
+          if (err) { return res.send({ message: err, status: false }) }
+          sendEmail(data.email, otp, result.rows[0])
+          res.json({ message: "user registration successfull", status: true })
+        })
       }
 
     })

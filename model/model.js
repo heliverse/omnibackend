@@ -42,6 +42,20 @@ Users.findByEmail = (Email, callback) => {
     })
 
 }
+
+// 
+Users.delete = (Email) => {
+    return new Promise((resolve, reject) => connection.query("delete from users where (email) = ($1)", [Email], (error, result) => {
+        if (error) {
+            reject(err)
+        }
+        else {
+            resolve()
+        }
+    }))
+
+}
+
 Users.findByUserId = (Id, callback) => {
     connection.query("select * from users where (id) = ($1)", [Id], (error, result) => {
         if (error) {
