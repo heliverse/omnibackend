@@ -1,5 +1,5 @@
 create db omifi
- CREATE table users( id serial Unique, 
+ CREATE table customers( id serial Unique, 
   balance INTEGER  NOT NULL, 
   firstname VARCHAR(100) NOT NULL,
   lastname VARCHAR(100) NOT NULL,
@@ -7,6 +7,7 @@ create db omifi
   email  VARCHAR(200) NOT NULL,
   otp VARCHAR(100) ,  
   status  BOOLEAN,
+  interest VARCHAR(200) NOT NULL
   PRIMARY KEY ( id,email ) );
                  
 

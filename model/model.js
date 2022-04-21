@@ -9,6 +9,7 @@ let Users = function (user) {
     this.balance = 0;
     this.otp = user.otp;
     this.status = user.status
+    this.interest = 0;
 }
 
 let Transaction = function (transaction) {
@@ -18,7 +19,7 @@ let Transaction = function (transaction) {
 }
 Users.create = async (Data, callback) => {
     let password = await generatePassword(Data.password)
-    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,otp,status) VALUES ($1, $2, $3, $4,$5,$6,$7) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status], (error, result) => {
+    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,otp,status,interest) VALUES ($1, $2, $3, $4,$5,$6,$7,$8) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status,Data.interest], (error, result) => {
         if (error) {
             callback(null, error)
         }
@@ -78,7 +79,17 @@ Users.updateStatus = (Id, callback) => {
         }
     })
 }
-Users.update = (callback) => {
+Users.update = (data, callback) => {
+    console.log(data, "model")
+    connection.query("UPDATE users SET balance=($2),average_time=($3),interest=($4) WHERE (id)=($1)", [data.id, data.balance, data.average_time, data.interest], (error, result) => {
+        if (error) {
+            callback(null, error)
+
+        } else {
+            callback(null, result)
+
+        }
+    })
 
 }
 Users.findAll = (callback) => {
