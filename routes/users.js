@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt")
 
 const { generateAccessToken, sendEmail, sendEmailForgotpassword } = require("../config/main")
 const { Users, Transaction } = require("../model/model");
-const { getToken, decodeToken } = require("../config/main");
+const { getToken, decodeToken, AVERAGETIME } = require("../config/main");
 function generateOTP() {
   var digits = '0123456789';
   let OTP = '';
@@ -30,11 +30,6 @@ const Registration = async (req, res) => {
       }
 
     })
-    // let emailVer = false
-    // sendTestMail function call
-    // if(emailVer){
-    //   response send kray gay
-    // }
 
   } catch (error) {
 
@@ -92,17 +87,156 @@ const transaction = async (req, res) => {
   }
 
 }
-
 const createTransaction = async (req, res) => {
 
   try {
     const data = await new Transaction(req.body)
-
+    const token = await getToken(req)
+    const TokenData = decodeToken(token)
+    data.user = TokenData.user.userId
     Transaction.add(data, function (err, result) {
       if (err) { res.send({ message: err, status: false }) }
-      res.json({ message: "Transaction successfull", status: true, })
+      else {
+        if (result.command == "INSERT") {
+
+          Users.findByUserId(TokenData.user.userId, async function (err, RESULT) {
+            if (RESULT.length) {
+
+              AVERAGETIME({ oldTime: RESULT[0].average_time, oldInterest: RESULT[0].interest, oldBalance: RESULT[0].balance, newBalance: data.amount, status: data.status, id: RESULT[0].id }, async (err, result) => {
+                if (result.error) {
+                  res.json({ message: result.error, status: false })
+                }
+                else {
+                  Users.update(result, async function (err, result) {
+
+                    if (result.command == "UPDATE") {
+                      res.send({ message: "transaction successfully done", status: true })
+                    }
+                    else {
+                      res.send({ message: "transaction successfully not done", status: true })
+                    }
+                  })
+                }
+
+              })
+            }
+          })
+        }
+      }
 
     })
+
+
+
+    // Transaction.add(data, function (err, result) {
+    //   if (err) { res.send({ message: err, status: false }) }
+    //   else {
+    //     if (result.command == "INSERT") {
+    //       Users.findByEmail(TokenData.user.email, async function (err, RESULT) {
+    //         if (RESULT.length) {
+    //           Transaction.findByUserId(TokenData.user.userId, async (err, result) => {
+    //             if (result.length) {
+    //               const LastTransactionData = result[result.length - 1]
+
+    // AVERAGETIME({ oldTime: RESULT[0].average_time, newTime: LastTransactionData.created, oldBalance: RESULT[0].balance, newBalance: LastTransactionData.amount, status: LastTransactionData.status, id: RESULT[0].id }, async (err, result) => {
+
+    //                 if (err) {
+    //                   res.json({ message: err, status: false })
+
+    //                 }
+    //                 else {
+    //                   // res.json({message:"successfully done",status:true})
+    //                 }
+
+
+    //               })
+
+    //             }
+    //           })
+
+
+    //           // console.log(data.status)
+    //           // switch (data.status) {
+
+    //           //   case "deposit": {
+    //           //     Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
+    //           //       if (result.length) {
+    //           //         const lastTransactionData = result[result.length - 1]
+    //           //      
+    //           //           Users.update(result, async function (err,result) {
+    //           //             if (err){
+    //           //               res.json({ message: "server error",status:false })
+    //           //             }
+    //           //             else {
+    //           //               res.json({ message: "transaction successfully done",status:true })
+    //           //             }
+    //           //           })
+    //           //         })
+    //           //       }
+    //           //     })
+    //           //     break;
+    //           //   }
+    //           //   case "WITHDRAW": {
+    //           //     if (RESULT[0].balance === 0) {
+    //           //       res.json({ message: "you have no balance",status:false  })
+    //           //     }
+    //           //     else {
+
+    //           //       Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
+    //           //         if (result.length) {
+    //           //           const lastTransactionData = result[result.length - 1]
+    //           //           if (RESULT[0].balance - lastTransactionData.amount > 0) {
+    //           //             res.json({ message: "you have no lol balance",status:false  })
+    //           //           }
+    //           //           else {
+    //           //             AVERAGETIME({ oldTime: RESULT[0].average_time, newTime: lastTransactionData.created, oldBalance: RESULT[0].balance, newBalance: lastTransactionData.amount, status: lastTransactionData.status, id: RESULT[0].id }, async (err, result) => {
+
+    //           //               Users.update(result, async function (err,result) {
+    //           //                 if (err){
+    //           //                   res.json({ message: "server error",status:false })
+    //           //                 }
+    //           //                 else {
+    //           //                   console.log(result)
+
+    //           //                   res.json({ message: "transaction successfully done",status:true })
+    //           //                 }
+    //           //               })
+    //           //             })
+    //           //           }
+
+    //           //         }
+
+    //           //       })
+    //           //     }
+    //           //     break;
+    //           //   }
+    //           //   default: {
+
+    //           //     res.json({ message: "unauthoized" ,status:false })
+    //           //     break;
+    //           //   }
+    //           // }
+
+
+    //           // Transaction.findByUserId(TokenData.user.userId, async (error,result)=>{
+
+
+    //           // })
+    //           // DATA = {
+    //           //   balance: result[0].balance, average_time: result[0].average_time, id: result[0].id
+    //           // }
+
+    //         }
+    //       })
+
+
+    //     }
+    //     else {
+
+    //       res.json({ message: "Transaction unsuccessfull", status: false, })
+    //     }
+    //   }
+    // })
 
   } catch (error) {
 

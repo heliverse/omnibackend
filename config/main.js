@@ -1,7 +1,7 @@
 var SibApiV3Sdk = require("sib-api-v3-sdk");
 const jwt = require('jsonwebtoken')
-let bcrypt = require("bcrypt")
-let defaultClient = SibApiV3Sdk.ApiClient.instance;
+const bcrypt = require("bcrypt")
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const secretKey = process.env.SECRET_KEY
 const jwtConfig = {
     secret: secretKey,
@@ -11,9 +11,8 @@ const jwtConfig = {
 }
 
 
-let apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey =
-    "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";
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = "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";
 
 exports.generateAccessToken = (user) => {
     const payload = { user }
@@ -44,13 +43,13 @@ exports.verifyJWTToken = (token) => {
 // }
 
 exports.generatePassword = async (payload) => {
-    let salt = await bcrypt.genSaltSync(10)
+    const salt = await bcrypt.genSaltSync(10)
     var password = await bcrypt.hashSync(payload, salt)
     return password
 }
-// let SecurePassword = async(payload,callback)=>{
+// const SecurePassword = async(payload,callback)=>{
 
-// let salt = bcrypt.genSaltSync(10)
+// const salt = bcrypt.genSaltSync(10)
 // console.log(salt)
 
 // var password = await bcrypt.hashSync(payload,salt)
@@ -126,4 +125,55 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
             console.error(error);
         }
     );
+
+exports.AVERAGETIME = async (req, callback) => {
+    // let Data = {}
+    // console.log(req)
+    const date = new Date()
+    const CalculateInterest = (data) => {
+        const olddate = new Date(data.oldTime); // 20th April 2021
+        const period = (date.getTime() - olddate.getTime()) / 1000;
+        const principal = data.amount;
+        const time = period;
+        const rate = 0.00000002536783358 // sec
+        const interest = (principal * rate * time) / 100
+
+        return interest
+
+    }
+    const interest = CalculateInterest(data = { amount: req.oldBalance, oldTime: req.oldTime })
+
+    switch (req.status) {
+
+        case "deposit": {
+
+            const Total = parseInt(req.newBalance) + parseInt(req.oldBalance)
+            const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
+            Data = { balance: Total, average_time: date, id: req.id, interest: Interest }
+            callback(null, Data)
+
+            break;
+
+        }
+        case "withdraw": {
+
+            if (req.oldBalance < req.newBalance) {
+
+                callback(null, err = { error: "you have no sufficient balance" })
+            } else {
+                const Total = parseInt(req.oldBalance) - parseInt(req.newBalance)
+                const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
+                console.log(Interest, interest)
+                callback(null, data = { balance: req.oldBalance - req.newBalance, average_time: date, id: req.id, interest: Interest, status: req.status })
+            }
+            break;
+        }
+        default: {
+
+            callback(null, err = { error: "nikl" })
+
+        }
+
+    }
+}
 }
