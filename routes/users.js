@@ -1,7 +1,7 @@
 
 const bcrypt = require("bcrypt")
 
-const { generateAccessToken, sendEmail } = require("../config/main")
+const { generateAccessToken, sendEmail, sendEmailForgotpassword } = require("../config/main")
 const { Users, Transaction } = require("../model/model");
 const { getToken, decodeToken } = require("../config/main");
 function generateOTP() {
@@ -146,9 +146,42 @@ const verifyOtp = async (req, res) => {
     console.log(err)
   }
 }
+const forgotPassword = async (req, res) => {
+  const email = req.body.email
+  Users.findByEmail(email, function (err, result) {
+
+    if (err) {
+      return res.json({ message: "User not found", status: false })
+    }
+    const otp = result[0].otp;
+    const userId = result[0].id;
+    sendEmailForgotpassword(email, otp, userId)
+    res.send(result)
+  })
+
+
+}
+
+const resetPassword = async (req, res) => {
+  const { id, otp, password, confirmPassword } = req.body;
+  if (password !== confirmPassword) {
+    return res.json({ message: "Passwords do not match", status: false })
+  }
+  Users.findByUserId(id, (err, result) => {
+    if (err) return res.json({ message: err, status: false })
+    if (result.length == 0) return res.json({ message: "User not found", status: false })
+    console.log(result[0].otp, otp, "sdf")
+    if (result[0].otp != otp) return res.json({ message: "Bad request", status: false })
+    Users.updatePassword(id, password, (err, result) => {
+      if (err) return res.json({ message: "Bad request", status: false })
+      console.log(result)
+      return res.json({ message: "Password updated successfully", status: true })
+    })
+  })
+}
 
 module.exports = {
-  Registration, Login, transaction, createTransaction, getUser, verifyOtp
+  Registration, Login, transaction, createTransaction, getUser, verifyOtp, forgotPassword, resetPassword
 }
 
 

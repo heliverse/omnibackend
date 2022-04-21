@@ -78,6 +78,20 @@ Users.updateStatus = (Id, callback) => {
         }
     })
 }
+
+Users.updatePassword = async (Id, pass, callback) => {
+    const password = await generatePassword(pass)
+    console.log(password, pass, "Password")
+    connection.query("update users set password = ($1) where id = ($2)", [password, Id], (err, result) => {
+        if (err) {
+            callback(err, null)
+        }
+        else {
+            callback(null, result)
+        }
+    })
+}
+
 Users.update = (callback) => {
 
 }

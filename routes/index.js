@@ -18,6 +18,8 @@ router.post('/registration', user.Registration)
 router.post("/login", user.Login)
 router.post("/auth/transaction", auth, user.createTransaction)
 router.get('/verify-otp/:id/:otp', user.verifyOtp)
+router.post("/forgotPassword", user.forgotPassword);
+router.post("/resetPassword", user.resetPassword);
 
 
 

@@ -102,3 +102,28 @@ exports.sendEmail = (address, otp, user) => {
         }
     );
 }
+
+exports.sendEmailForgotpassword = (address, otp, id) => {
+
+    var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+    var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
+    sendSmtpEmail = {
+        sender: { email: "abdul@heliverse.com" },
+        to: [
+            {
+                email: address,
+            },
+        ],
+        subject: "Reset Password",
+    };
+    sendSmtpEmail.htmlContent = "<html><body><h1>Omnifi</h1>Please click on the below button to reset your password<br><a  href={{params.link}} >Reset password</a></body></html>";
+    sendSmtpEmail.params = { link: 'http://localhost:3000/reset-password/' + id + '/' + otp };
+    apiInstance.sendTransacEmail(sendSmtpEmail).then(
+        function (data) {
+            console.log("API called successfully. Returned data: " + data);
+        },
+        function (error) {
+            console.error(error);
+        }
+    );
+}
