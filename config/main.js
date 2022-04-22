@@ -126,9 +126,10 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
         }
     );
 
+ 
+}
 exports.AVERAGETIME = async (req, callback) => {
-    // let Data = {}
-    // console.log(req)
+
     const date = new Date()
     const CalculateInterest = (data) => {
         const olddate = new Date(data.oldTime); // 20th April 2021
@@ -163,7 +164,7 @@ exports.AVERAGETIME = async (req, callback) => {
             } else {
                 const Total = parseInt(req.oldBalance) - parseInt(req.newBalance)
                 const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-                console.log(Interest, interest)
+          
                 callback(null, data = { balance: req.oldBalance - req.newBalance, average_time: date, id: req.id, interest: Interest, status: req.status })
             }
             break;
@@ -175,5 +176,4 @@ exports.AVERAGETIME = async (req, callback) => {
         }
 
     }
-}
 }

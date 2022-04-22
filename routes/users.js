@@ -94,9 +94,13 @@ const createTransaction = async (req, res) => {
     const token = await getToken(req)
     const TokenData = decodeToken(token)
     data.user = TokenData.user.userId
+    console.log(data)
+  
     Transaction.add(data, function (err, result) {
-      if (err) { res.send({ message: err, status: false }) }
+      if (err) { res.send({ message: "not add", status: false })
+    }
       else {
+        
         if (result.command == "INSERT") {
 
           Users.findByUserId(TokenData.user.userId, async function (err, RESULT) {
@@ -125,118 +129,6 @@ const createTransaction = async (req, res) => {
       }
 
     })
-
-
-
-    // Transaction.add(data, function (err, result) {
-    //   if (err) { res.send({ message: err, status: false }) }
-    //   else {
-    //     if (result.command == "INSERT") {
-    //       Users.findByEmail(TokenData.user.email, async function (err, RESULT) {
-    //         if (RESULT.length) {
-    //           Transaction.findByUserId(TokenData.user.userId, async (err, result) => {
-    //             if (result.length) {
-    //               const LastTransactionData = result[result.length - 1]
-
-    // AVERAGETIME({ oldTime: RESULT[0].average_time, newTime: LastTransactionData.created, oldBalance: RESULT[0].balance, newBalance: LastTransactionData.amount, status: LastTransactionData.status, id: RESULT[0].id }, async (err, result) => {
-
-    //                 if (err) {
-    //                   res.json({ message: err, status: false })
-
-    //                 }
-    //                 else {
-    //                   // res.json({message:"successfully done",status:true})
-    //                 }
-
-
-    //               })
-
-    //             }
-    //           })
-
-
-    //           // console.log(data.status)
-    //           // switch (data.status) {
-
-    //           //   case "deposit": {
-    //           //     Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
-    //           //       if (result.length) {
-    //           //         const lastTransactionData = result[result.length - 1]
-    //           //      
-    //           //           Users.update(result, async function (err,result) {
-    //           //             if (err){
-    //           //               res.json({ message: "server error",status:false })
-    //           //             }
-    //           //             else {
-    //           //               res.json({ message: "transaction successfully done",status:true })
-    //           //             }
-    //           //           })
-    //           //         })
-    //           //       }
-    //           //     })
-    //           //     break;
-    //           //   }
-    //           //   case "WITHDRAW": {
-    //           //     if (RESULT[0].balance === 0) {
-    //           //       res.json({ message: "you have no balance",status:false  })
-    //           //     }
-    //           //     else {
-
-    //           //       Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
-    //           //         if (result.length) {
-    //           //           const lastTransactionData = result[result.length - 1]
-    //           //           if (RESULT[0].balance - lastTransactionData.amount > 0) {
-    //           //             res.json({ message: "you have no lol balance",status:false  })
-    //           //           }
-    //           //           else {
-    //           //             AVERAGETIME({ oldTime: RESULT[0].average_time, newTime: lastTransactionData.created, oldBalance: RESULT[0].balance, newBalance: lastTransactionData.amount, status: lastTransactionData.status, id: RESULT[0].id }, async (err, result) => {
-
-    //           //               Users.update(result, async function (err,result) {
-    //           //                 if (err){
-    //           //                   res.json({ message: "server error",status:false })
-    //           //                 }
-    //           //                 else {
-    //           //                   console.log(result)
-
-    //           //                   res.json({ message: "transaction successfully done",status:true })
-    //           //                 }
-    //           //               })
-    //           //             })
-    //           //           }
-
-    //           //         }
-
-    //           //       })
-    //           //     }
-    //           //     break;
-    //           //   }
-    //           //   default: {
-
-    //           //     res.json({ message: "unauthoized" ,status:false })
-    //           //     break;
-    //           //   }
-    //           // }
-
-
-    //           // Transaction.findByUserId(TokenData.user.userId, async (error,result)=>{
-
-
-    //           // })
-    //           // DATA = {
-    //           //   balance: result[0].balance, average_time: result[0].average_time, id: result[0].id
-    //           // }
-
-    //         }
-    //       })
-
-
-    //     }
-    //     else {
-
-    //       res.json({ message: "Transaction unsuccessfull", status: false, })
-    //     }
-    //   }
-    // })
 
   } catch (error) {
 
@@ -283,7 +175,6 @@ const verifyOtp = async (req, res) => {
 const forgotPassword = async (req, res) => {
   const email = req.body.email
   Users.findByEmail(email, function (err, result) {
-
     if (err) {
       return res.json({ message: "User not found", status: false })
     }
