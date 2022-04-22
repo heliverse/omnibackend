@@ -19,7 +19,7 @@ let Transaction = function (transaction) {
 }
 Users.create = async (Data, callback) => {
     let password = await generatePassword(Data.password)
-    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,otp,status,interest) VALUES ($1, $2, $3, $4,$5,$6,$7,$8) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status,Data.interest], (error, result) => {
+    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,otp,status,interest) VALUES ($1, $2, $3, $4,$5,$6,$7,$8) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status, Data.interest], (error, result) => {
         if (error) {
             callback(null, error)
         }
@@ -94,18 +94,19 @@ Users.updatePassword = async (Id, pass, callback) => {
 }
 
 Users.update = (callback) => {
-Users.update = (data, callback) => {
-    console.log(data, "model")
-    connection.query("UPDATE users SET balance=($2),average_time=($3),interest=($4) WHERE (id)=($1)", [data.id, data.balance, data.average_time, data.interest], (error, result) => {
-        if (error) {
-            callback(null, error)
+    Users.update = (data, callback) => {
+        console.log(data, "model")
+        connection.query("UPDATE users SET balance=($2),average_time=($3),interest=($4) WHERE (id)=($1)", [data.id, data.balance, data.average_time, data.interest], (error, result) => {
+            if (error) {
+                callback(null, error)
 
-        } else {
-            callback(null, result)
+            } else {
+                callback(null, result)
 
-        }
-    })
+            }
+        })
 
+    }
 }
 Users.findAll = (callback) => {
 
@@ -132,6 +133,17 @@ Transaction.findAll = (callback) => {
     })
 }
 
+Transaction.add = (Data, callback) => {
+    console.log(Data)
+    connection.query('INSERT INTO transactions (user_id,amount,status) VALUES ($1, $2,$3)', [Data.user, Data.amount, Data.status], (error, result) => {
+        if (error) {
+            callback(null, error)
+        }
+        else {
+            callback(null, result)
+        }
+    })
+}
 Transaction.findByUserId = (Userid, callback) => {
 
     connection.query("select * from transactions where (user_id) =($1) ", [Userid], (error, result) => {
@@ -149,17 +161,7 @@ Transaction.findByUserId = (Userid, callback) => {
 
 
 
-Transaction.add = async (Data, callback) => {
 
-    connection.query('INSERT INTO transactions (user_id,amount,status) VALUES ($1, $2,$3)', [Data.user, Data.amount, Data.status], (error, result) => {
-        if (error) {
-            callback(null, error)
-        }
-        else {
-            callback(null, result)
-        }
-    })
-}}
 
 
 module.exports = { Users, Transaction }
