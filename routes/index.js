@@ -20,6 +20,9 @@ router.get('/verify-otp/:id/:otp', user.verifyOtp)
 router.post("/forgotPassword", user.forgotPassword);
 router.post("/resetPassword", user.resetPassword);
 
+router.get('/login/google', user.loginWithGoogle)
+router.get('/google/callback', user.getAccessToken);
+
 
 
 

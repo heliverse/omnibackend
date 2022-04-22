@@ -1,6 +1,6 @@
-
+const jwt_decode = require("jwt-decode");
 const bcrypt = require("bcrypt")
-
+const Google = require('../services/Google')
 const { generateAccessToken, sendEmail, sendEmailForgotpassword } = require("../config/main")
 const { Users, Transaction } = require("../model/model");
 const { getToken, decodeToken, AVERAGETIME } = require("../config/main");
@@ -314,8 +314,50 @@ const resetPassword = async (req, res) => {
   })
 }
 
+const loginWithGoogle = async (req, res) => {
+  try {
+    const goggle = new Google();
+    const authUrl = goggle.login();
+    console.log(authUrl);
+    res.redirect(authUrl)
+  } catch (error) {
+    console.log(error);
+    res.json(error)
+  }
+}
+
+const getAccessToken = async (req, res) => {
+  try {
+    console.log(req.query)
+    const google = new Google();
+    const result = await google.getAccessToken(req.query);
+    const { name, email } = jwt_decode(result.id_token);
+    // res.redirect(`http://localhost:3000/google?access_token=${result.access_token}&id_token=${result.id_token}`)
+    Users.findByEmail(email, async function (err, result) {
+      if (err) { res.json({ message: err, status: false }) }
+      else {
+        if (result.length > 0) {
+          const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: "" })
+          return res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
+
+        }
+        Users.create({ firstname: name, lastname: "", email, password: "", balance: 0, otp: "", status: true, interest: "" }, async function (err, result) {
+          if (err) { return res.send({ message: err, status: false }) }
+          console.log(result, "THISIS RESULT")
+          const accessToken = await generateAccessToken({ userId: result.rows[0].id, email, password: "" })
+          return res.json({ message: "Login successfully done", status: true, token: accessToken, id: result.rows[0].id })
+        })
+      }
+
+    })
+  } catch (error) {
+    console.log(error);
+    res.json(error)
+  }
+}
+
 module.exports = {
-  Registration, Login, transaction, createTransaction, getUser, verifyOtp, forgotPassword, resetPassword
+  Registration, Login, getAccessToken, loginWithGoogle, transaction, createTransaction, getUser, verifyOtp, forgotPassword, resetPassword
 }
 
 
