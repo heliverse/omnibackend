@@ -142,6 +142,7 @@ const GetAllUser = async (req, res) => {
 
   }
 }
+
 const GetOneUser = async (req, res) => {
   try {
 
@@ -240,7 +241,8 @@ const resetPassword = async (req, res) => {
     Users.findByUserId(id, (err, result) => {
 
       if (result.length) {
-        if ((result[0].otp == otp) && (result[0].otp_status == true)) {
+        console.log(result)
+        if ((result[0].authentication_key == otp) && (result[0].is_confirmed == true)) {
           Users.updatePassword(id, password, (err, result) => {
             if (err) return res.json({ message: "Bad request", status: false })
             Users.updateOTP(data = { otp: 0, userId: id, status: false }, async function (err, result) {
