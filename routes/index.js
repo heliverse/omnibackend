@@ -16,12 +16,12 @@ const Users = require('../model/user');
 router.use(urlencodedParser)
 
 //admin api
-router.post("admin/login", Admin.Login)
+// router.get("/auth/admin/transaction", auth, transaction.transaction)
+router.post("/admin/login", Admin.Login)
 
 router.post("/admin/registration", Admin.create)
 
 router.get("/admin/auth/getuser", user.GetAllUser)
-
 router.get("/admin/auth/getuser:id", user.GetOneUser)
 
 

@@ -15,9 +15,9 @@ const Admin = function (Admin) {
 
 Admin.create = async (Data, callback) => {
     const password = await generatePassword(Data.password)
-    connection.query('INSERT INTO Admin (firstname,lastname,email,password,status,otp,role_type) VALUES ($1, $2, $3, $4,$5,$6,$7) RETURNING id,email,password', [Data.firstname, Data.lastname, Data.email, password, Data.status, Data.otp, Data.role_type], (error, result) => {
+    connection.query('INSERT INTO Admin (firstname,lastname,email,password,status,is_authenticated) VALUES ($1, $2, $3, $4,$5,$6) RETURNING id,email,password', [Data.firstname, Data.lastname, Data.email, password, Data.status,true], (error, result) => {
         if (error) {
-            callback(null, error)
+            callback(error, null)
         }
         else {
 
