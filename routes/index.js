@@ -8,6 +8,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 router.use(bodyParser.json())
 // /* GET home page. */
 const auth = require("../config/middleware");
+const Users = require('../model/user');
 
 
 
@@ -15,8 +16,12 @@ const auth = require("../config/middleware");
 router.use(urlencodedParser)
 
 //admin api
-router.get("/auth/admin/transaction", auth, transaction.transaction)
-router.post("/registration/admin", Admin.create)
+// router.get("/auth/admin/transaction", auth, transaction.transaction)
+router.get("admin/login", auth, Admin.Login)
+
+router.post("/admin/registration", Admin.create)
+
+router.post("/admin/auth/getuser", Users.getUser)
 
 
 

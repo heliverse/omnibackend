@@ -22,15 +22,16 @@ const auth = async (req, res, next) => {
                     res.send(err)
                 }
                 if (result.length > 0) {
-                    // let match = await bcrypt.compare(password, result[0].password)
-                    // console.log(password, result[0].password, match)
-                    // if (match) {
+                    const match = await bcrypt.compare(password, result[0].password)
+                    console.log(password, result[0].password, match)
+                    if (match) {
+                        
                         // res.status(200).json({ message: "authorize access", status: false })
                           next()
-                    // }
-                    // else {
-                    //     res.status(200).json({ message: "unauthorize access", status: false })
-                    // }
+                    }
+                    else {
+                        res.status(200).json({ message: "unauthorize access", status: false })
+                    }
                 }
                 else {
                     res.status(400).json({ message: "unauthorize access", status: false })

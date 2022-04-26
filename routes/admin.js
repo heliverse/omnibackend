@@ -54,4 +54,4 @@ const Login = async (req, res) => {
 }
 
 
-module.exports = { create }
+module.exports = { create ,Login}

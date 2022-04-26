@@ -32,5 +32,5 @@ FOREIGN KEY (user_id) REFERENCES users (id));
   email  VARCHAR(200) NOT NULL,
   Is_authenticated VARCHAR(100) NOT NULL , 
   status  BOOLEAN,
-    isConfirmed BOOLEAN,
+  isConfirmed BOOLEAN,
   PRIMARY KEY ( id,email ) );

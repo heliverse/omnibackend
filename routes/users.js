@@ -126,6 +126,39 @@ const getUser = async (req, res) => {
   }
 }
 
+const GetAllUser = async (req, res) => {
+  try {
+    const token = await getToken(req.body)
+
+    Users.findAll(token, function (err, result) {
+      if (err) {
+
+      }
+      res.json(result)
+    })
+
+
+  } catch (error) {
+
+  }
+}
+const GetOneUser = async (req, res) => {
+  try {
+
+    const TokenData = req.body
+    if (TokenData) {
+      Users.findByUserId(TokenData.id, function (err, result) {
+        if (err) {
+
+        }
+        res.json(result)
+      })
+    }
+
+  } catch (error) {
+
+  }
+}
 
 
 
@@ -268,12 +301,12 @@ const getAccessToken = async (req, res) => {
       if (err) { res.json({ message: err, status: false }) }
       else {
         if (result.length > 0) {
-         const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
+          const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
           res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
 
         }
         else {
-       
+
           Users.create({ firstname: googleData.given_name, lastname: googleData.family_name, email: googleData.email, password: googleData.at_hash, balance: 0, otp: 0, status: true, interest: 0, role_type: "user" }, async function (err, RESULT) {
             if (err) { res.send({ message: err, status: false }) }
             if (RESULT.command == 'INSERT') {
