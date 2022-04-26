@@ -31,6 +31,7 @@ router.get("/admin/auth/getuser:id", user.GetOneUser)
 
 //users api
 
+router.get("/auth/transaction", auth, transaction.transaction)
 router.get("/auth/user", auth, user.getUser)
 
 

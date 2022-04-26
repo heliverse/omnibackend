@@ -61,9 +61,10 @@ const createTransaction = async (req, res) => {
   
   const transaction = async (req, res) => {
     try {
+      
       const token = await getToken(req)
       const TokenData = decodeToken(token)
-      // console.log(TokenData.user.userId)
+      console.log(TokenData.user.userId)
       if (TokenData) {
         Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
           if (err) {
