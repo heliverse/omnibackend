@@ -22,7 +22,7 @@ router.post("/admin/login", Admin.Login)
 router.post("/admin/registration", Admin.create)
 
 router.get("/admin/auth/getuser", user.GetAllUser)
-router.get("/admin/auth/getuser:id", user.GetOneUser)
+router.get("/admin/auth/getuser/:id", user.GetOneUser)
 
 
 

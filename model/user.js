@@ -18,9 +18,9 @@ const Users = function (user) {
 
 Users.create = async (Data, callback) => {
     const password = await generatePassword(Data.password)
-    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,otp,status,interest,role_type) VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status, Data.interest,Data.role_type], (error, result) => {
+    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,Is_authenticated,status,interest,role_type) VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status, Data.interest,Data.role_type], (error, result) => {
         if (error) {
-            callback(null, error)
+            callback(error, null)
         }
         else {
 
@@ -201,7 +201,7 @@ Users.findAll = (callback) => {
 
     connection.query("select * from users", (error, result) => {
         if (error) {
-            callback(null, error)
+            callback(error, null)
         }
         else {
             callback(null, result.rows)
