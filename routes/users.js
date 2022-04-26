@@ -336,7 +336,7 @@ const getAccessToken = async (req, res) => {
 }
 
 module.exports = {
-  Registration, Login, getAccessToken, loginWithGoogle, getUser, verifyOtp, forgotPassword, resetPassword
+  Registration, Login, getAccessToken, loginWithGoogle, getUser, verifyOtp, forgotPassword, resetPassword,GetAllUser,GetOneUser
 }
 
 
