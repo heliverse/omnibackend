@@ -43,7 +43,7 @@ Users.create = async (Data, callback) => {
 
 
 Users.findByEmail = (Email, callback) => {
-    connection.query("select * from Admin where (email) = ($1)", [Email], (error, result) => {
+    connection.query("select * from users where (email) = ($1)", [Email], (error, result) => {
         if (error) {
             callback(error, null)
         }
@@ -55,13 +55,18 @@ Users.findByEmail = (Email, callback) => {
 
 }
 
+Users.findAdminByEmail = (Email, callback) => {
+    connection.query("select * from Admin where (email) = ($1)", [Email], (error, result) => {
+        if (error) {
+            callback(error, null)
+        }
+        else {
 
+            callback(null, result.rows)
+        }
+    })
 
-
-
-
-
-
+}
 
 
 Users.delete = (Email) => {
@@ -88,11 +93,11 @@ Users.delete = (Email) => {
 Users.findByUserId = (Id, callback) => {
     connection.query("select * from users where (id) = ($1)", [Id], (error, result) => {
         if (error) {
-            callback(null, error)
+            callback(error, null)
         }
         else {
 
-            callback(null, result.rows)
+            callback(null, result.rows[0])
         }
     })
 

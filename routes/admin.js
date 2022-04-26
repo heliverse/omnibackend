@@ -32,7 +32,7 @@ const create = async (req, res) => {
 const Login = async (req, res) => {
     try {
         const { email, password } = req.body
-        Users.findByEmail(email, async function (err, result) {
+        Users.findAdminByEmail(email, async function (err, result) {
             if (err) {
                 res.json({ message: "Bad reruest", status: false })
             }
