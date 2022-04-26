@@ -48,14 +48,14 @@ exports.generatePassword = async (payload) => {
     return password
 }
 
-exports.generateOTP=()=> {
+exports.generateOTP = () => {
     var digits = '0123456789';
     let OTP = '';
     for (let i = 0; i < 4; i++) {
-      OTP += digits[Math.floor(Math.random() * 10)];
+        OTP += digits[Math.floor(Math.random() * 10)];
     }
     return OTP;
-  }
+}
 // const SecurePassword = async(payload,callback)=>{
 
 // const salt = bcrypt.genSaltSync(10)
@@ -128,14 +128,14 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
     sendSmtpEmail.params = { link: 'http://localhost:3000/reset-password/' + id + '/' + otp };
     apiInstance.sendTransacEmail(sendSmtpEmail).then(
         function (data) {
-            
+
         },
         function (error) {
             console.error(error);
         }
     );
 
- 
+
 }
 exports.AVERAGETIME = async (req, callback) => {
 
@@ -143,23 +143,23 @@ exports.AVERAGETIME = async (req, callback) => {
     const CalculateInterest = (data) => {
         const olddate = new Date(data.oldTime); // 20th April 2021
         const period = (date.getTime() - olddate.getTime()) / 1000;
-        const principal = data.amount;
+        const principal = parseFloat(data.amount);
         const time = period;
         const rate = 0.00000002536783358 // sec
         const interest = (principal * rate * time) / 100
-
+        
         return interest
-
     }
     const interest = CalculateInterest(data = { amount: req.oldBalance, oldTime: req.oldTime })
 
     switch (req.status) {
 
         case "deposit": {
-
-            const Total = parseInt(req.newBalance) + parseInt(req.oldBalance)
+           
+            const Total = parseFloat(req.newBalance) + parseFloat(req.oldBalance)
             const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-            Data = { balance: Total, transactions_time: date, id: req.id, interest: Interest }
+            
+            Data = { balance: Total, last_transactions_time: date, id: req.id, interest: 0 }
             callback(null, Data)
 
             break;
@@ -171,10 +171,10 @@ exports.AVERAGETIME = async (req, callback) => {
 
                 callback(null, err = { error: "you have no sufficient balance" })
             } else {
-                const Total = parseInt(req.oldBalance) - parseInt(req.newBalance)
+                const Total = parseFloat(req.oldBalance) - parseFloat(req.newBalance)
                 const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-          
-                callback(null, data = { balance: req.oldBalance - req.newBalance, transactions_time: date, id: req.id, interest: Interest, status: req.status })
+
+                callback(null, data = { balance: req.oldBalance - req.newBalance, last_transactions_time: date, id: req.id, interest: Interest, status: req.status })
             }
             break;
         }
@@ -185,4 +185,78 @@ exports.AVERAGETIME = async (req, callback) => {
         }
 
     }
+}
+
+
+
+
+const Users = require("../model/user");
+const Transaction = require("../model/transaction");
+
+const getLastMonth =()=>{
+    var month = new Date().getMonth(); // January
+    var d = new Date(2022, month + 1, 1);
+    console.log(d.getTime());
+    return d.getTime()
+    }
+
+const InterestCalculate = (data) => {
+    const date = new Date()
+    const olddate = new Date(data.oldTime); // 20th April 2021
+    const period = (getLastMonth() - olddate.getTime()) / 1000;
+    const principal = data.balance;
+    const time = period;
+    const rate = 0.00000002536783358 // sec
+    const interest = (principal * rate * time) / 100
+    const final_interest = (parseFloat(interest) + parseFloat(data.oldInterest))
+
+    return { id: data.id, interest: final_interest, balance: (parseFloat(data.balance) + parseFloat(final_interest)) }
+}
+
+
+
+
+exports.monthlyInterest = async () => {
+
+    Users.findAll(async function (err, UserResult) {
+        if (err) {
+            console.log(err)
+        }
+        else {
+
+            for (i = 0; i < UserResult.length; i++) {
+                console.log(UserResult[i])
+                const interest = await InterestCalculate(data = { id: UserResult[i].id, balance: UserResult[i].balance, oldTime: UserResult[i].last_transactions_time, oldInterest: UserResult[i].interest })
+                Transaction.add(data = { user: UserResult[i].id, amount: interest.interest, status: "deposit" }, async (err, result) => {
+                    if (result) {
+                        const date = new Date()
+                        Users.update(data = { id: interest.id, balance: interest.balance, interest: 0, last_transactions_time: date }, async function (err, result) {
+
+                            if (result.command == "UPDATE") {
+                                // console.log(result)
+                                //   res.send({ message: "Transaction successfully done", status: true })
+                            }
+                            else {
+                                //   res.send({ message: "Transaction successfully not done", status: true })
+                            }
+                        })
+                    }
+
+                })
+
+            }
+
+
+
+
+        }
+
+    })
+
+
+
+
+
+
+
 }

@@ -1,6 +1,7 @@
 
 let express = require('express');
 require('dotenv').config();
+const {monthlyInterest} =require("./config/main")
 let cors = require("cors")
 let Router = require('./routes/index');
 let app = express();
@@ -17,11 +18,23 @@ app.use(session({
 
 app.use("/", Router)
 
+
+
+
+
+
 // var CronJob = require('cron').CronJob;
-// var job = new CronJob('* 1 * * * *', function() {
+// var job = new CronJob('* * * * * *', function() {
+//   monthlyInterest()
 //   console.log('You will see this message every second');
 // }, null, true, 'America/Los_Angeles');
-// job.start();
+//  job.start();
+
+
+
+
+
+
 
 app.listen(port, () => {
   console.log("i m on")
