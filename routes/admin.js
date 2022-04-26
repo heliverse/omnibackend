@@ -1,4 +1,7 @@
+const { generateOTP, generateAccessToken } = require("../config/main")
 const Admin = require("../model/admin")
+const Users = require("../model/user")
+const bcrypt = require("bcrypt")
 
 
 
@@ -10,10 +13,13 @@ const create = async (req, res) => {
         const data = new Admin({ ...req.body, otp, status: true })
         Admin.create(data, async (error, result) => {
             if (error) { return res.send({ message: err, status: false }) }
+            console.log(result)
             // sendEmail(data.email, otp, result.rows[0])
             res.json({ message: "User registration successfull", status: true })
         })
     } catch (error) {
+        console.log(error)
+        res.json({ message: error, status: false })
     }
 }
 
@@ -31,6 +37,7 @@ const Login = async (req, res) => {
                 res.json({ message: "Bad reruest", status: false })
             }
             else {
+                console.log(result)
                 if (result.length > 0) {
                     if (result[0].status == false) return res.json({ message: "Please verify your email.", status: false })
                     const match = await bcrypt.compare(password, result[0].password)
@@ -48,6 +55,7 @@ const Login = async (req, res) => {
             }
         })
     } catch (error) {
+        console.log(error)
         res.json({ message: error, status: false })
     }
 
