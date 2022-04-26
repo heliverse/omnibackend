@@ -47,6 +47,15 @@ exports.generatePassword = async (payload) => {
     var password = await bcrypt.hashSync(payload, salt)
     return password
 }
+
+exports.generateOTP=()=> {
+    var digits = '0123456789';
+    let OTP = '';
+    for (let i = 0; i < 4; i++) {
+      OTP += digits[Math.floor(Math.random() * 10)];
+    }
+    return OTP;
+  }
 // const SecurePassword = async(payload,callback)=>{
 
 // const salt = bcrypt.genSaltSync(10)
@@ -82,7 +91,7 @@ exports.sendEmail = (address, otp, user) => {
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
-        sender: { email: "abdul@heliverse.com" },
+        sender: { email: "support@heliverse" },
         to: [
             {
                 email: address,
@@ -94,7 +103,7 @@ exports.sendEmail = (address, otp, user) => {
     sendSmtpEmail.params = { "otp": otp, link: 'http://localhost:3000/verify-otp/' + user.id + "/" + otp };
     apiInstance.sendTransacEmail(sendSmtpEmail).then(
         function (data) {
-            console.log("API called successfully. Returned data: " + data);
+            // console.log("API called successfully. Returned data: " + data);
         },
         function (error) {
             console.error(error);
@@ -107,7 +116,7 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
-        sender: { email: "abdul@heliverse.com" },
+        sender: { email: "support@heliverse.com" },
         to: [
             {
                 email: address,
@@ -119,7 +128,7 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
     sendSmtpEmail.params = { link: 'http://localhost:3000/reset-password/' + id + '/' + otp };
     apiInstance.sendTransacEmail(sendSmtpEmail).then(
         function (data) {
-            console.log("API called successfully. Returned data: " + data);
+            
         },
         function (error) {
             console.error(error);
@@ -150,7 +159,7 @@ exports.AVERAGETIME = async (req, callback) => {
 
             const Total = parseInt(req.newBalance) + parseInt(req.oldBalance)
             const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-            Data = { balance: Total, average_time: date, id: req.id, interest: Interest }
+            Data = { balance: Total, transactions_time: date, id: req.id, interest: Interest }
             callback(null, Data)
 
             break;
@@ -165,13 +174,13 @@ exports.AVERAGETIME = async (req, callback) => {
                 const Total = parseInt(req.oldBalance) - parseInt(req.newBalance)
                 const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
           
-                callback(null, data = { balance: req.oldBalance - req.newBalance, average_time: date, id: req.id, interest: Interest, status: req.status })
+                callback(null, data = { balance: req.oldBalance - req.newBalance, transactions_time: date, id: req.id, interest: Interest, status: req.status })
             }
             break;
         }
         default: {
 
-            callback(null, err = { error: "nikl" })
+            callback(null, err = { error: "not support" })
 
         }
 

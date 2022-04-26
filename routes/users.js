@@ -1,17 +1,12 @@
 const jwt_decode = require("jwt-decode");
 const bcrypt = require("bcrypt")
 const Google = require('../services/Google')
-const { generateAccessToken, sendEmail, sendEmailForgotpassword } = require("../config/main")
 const { Users, Transaction } = require("../model/model");
-const { getToken, decodeToken, AVERAGETIME } = require("../config/main");
-function generateOTP() {
-  var digits = '0123456789';
-  let OTP = '';
-  for (let i = 0; i < 4; i++) {
-    OTP += digits[Math.floor(Math.random() * 10)];
-  }
-  return OTP;
-}
+const { getToken, decodeToken, AVERAGETIME, generatePassword, generateOTP, generateAccessToken, sendEmail, sendEmailForgotpassword } = require("../config/main");
+
+
+
+
 const Registration = async (req, res) => {
 
   try {
@@ -20,12 +15,14 @@ const Registration = async (req, res) => {
     Users.findByEmail(data.email, async function (err, result) {
       if (err) { res.json({ message: err, status: false }) }
       else {
-        if (result.length > 0 && result[0].status == true) { return res.json({ message: "user already exist", status: false }) }
+
+        // console.log(result)
+        if (result.length > 0 && result[0].status == true) { return res.json({ message: "User already exist", status: false }) }
         if (result.length > 0 && result[0].status == false) await Users.delete(data.email)
         Users.create(data, function (err, result) {
           if (err) { return res.send({ message: err, status: false }) }
           sendEmail(data.email, otp, result.rows[0])
-          res.json({ message: "user registration successfull", status: true })
+          res.json({ message: "User registration successfull", status: true })
         })
       }
 
@@ -36,12 +33,28 @@ const Registration = async (req, res) => {
     res.json({ message: error, status: false })
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const Login = async (req, res) => {
   try {
     const { email, password } = req.body
     Users.findByEmail(email, async function (err, result) {
       if (err) {
-        res.json({ message: "bad reruest", status: false })
+        res.json({ message: "Bad reruest", status: false })
       }
       else {
         if (result.length > 0) {
@@ -49,14 +62,14 @@ const Login = async (req, res) => {
           const match = await bcrypt.compare(password, result[0].password)
           if (match) {
             const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
-            res.json({ message: "login successfully done", status: true, token: accessToken, id: result[0].id })
+            res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
           }
           else {
-            res.json({ message: "pass not match", status: false })
+            res.json({ message: "Password  not match", status: false })
           }
         }
         else {
-          res.status(400).json({ message: "invalid email", status: false })
+          res.status(400).json({ message: "Invalid email", status: false })
         }
       }
     })
@@ -65,76 +78,32 @@ const Login = async (req, res) => {
   }
 
 }
-const transaction = async (req, res) => {
-  try {
-    const token = await getToken(req)
-    const TokenData = decodeToken(token)
-    // console.log(TokenData.user.userId)
-    if (TokenData) {
-      Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
-        if (err) {
-          res.json({ message: err, status: false })
-        }
-        else {
-          res.send({ data: result, status: true })
 
-        }
-      })
-    }
 
-  } catch (error) {
 
-  }
 
-}
-const createTransaction = async (req, res) => {
 
-  try {
-    const data = await new Transaction(req.body)
-    const token = await getToken(req)
-    const TokenData = decodeToken(token)
-    data.user = TokenData.user.userId
-    console.log(data)
-  
-    Transaction.add(data, function (err, result) {
-      if (err) { res.send({ message: "not add", status: false })
-    }
-      else {
-        
-        if (result.command == "INSERT") {
 
-          Users.findByUserId(TokenData.user.userId, async function (err, RESULT) {
-            if (RESULT.length) {
 
-              AVERAGETIME({ oldTime: RESULT[0].average_time, oldInterest: RESULT[0].interest, oldBalance: RESULT[0].balance, newBalance: data.amount, status: data.status, id: RESULT[0].id }, async (err, result) => {
-                if (result.error) {
-                  res.json({ message: result.error, status: false })
-                }
-                else {
-                  Users.update(result, async function (err, result) {
 
-                    if (result.command == "UPDATE") {
-                      res.send({ message: "transaction successfully done", status: true })
-                    }
-                    else {
-                      res.send({ message: "transaction successfully not done", status: true })
-                    }
-                  })
-                }
 
-              })
-            }
-          })
-        }
-      }
 
-    })
 
-  } catch (error) {
 
-    res.json({ message: error, status: false, })
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const getUser = async (req, res) => {
   try {
@@ -143,9 +112,12 @@ const getUser = async (req, res) => {
     if (TokenData) {
       Users.findByEmail(TokenData.user.email, function (err, result) {
         if (err) {
-          console.log(err)
+          // 
+
+
+
         }
-        res.send(result)
+        res.json(result)
       })
     }
 
@@ -153,6 +125,10 @@ const getUser = async (req, res) => {
 
   }
 }
+
+
+
+
 
 const verifyOtp = async (req, res) => {
   try {
@@ -164,91 +140,170 @@ const verifyOtp = async (req, res) => {
       if (result[0].otp != otp) return res.json({ message: "Invalid OTP", status: false })
       Users.updateStatus(id, (err, result) => {
         if (err) return res.json({ message: "Bad request", status: false })
-        console.log("-------", result, "-------")
-        return res.json({ message: "OTP verified successfully", status: true })
+        // console.log("-------", result, "-------")
+        return res.json({ message: "Otp verified successfully", status: true })
       })
     })
   } catch (err) {
-    console.log(err)
+    // console.log(err)
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 const forgotPassword = async (req, res) => {
-  const email = req.body.email
-  Users.findByEmail(email, function (err, result) {
-    if (err) {
-      return res.json({ message: "User not found", status: false })
-    }
-    const otp = result[0].otp;
-    const userId = result[0].id;
-    sendEmailForgotpassword(email, otp, userId)
-    res.send(result)
-  })
+  try {
+    const EMAIL = req.body.email
+    Users.findByEmail(EMAIL, async function (err, result) {
+      if (err) {
+        res.json({ message: "User not found", status: false })
+      }
+      else {
+        let otp = await generateOTP();
+        // otp = await generatePassword(otp)
+        const userId = result[0].id;
+        Users.updateOTP(data = { otp, userId, status: true }, async function (err, result) {
+          sendEmailForgotpassword(EMAIL, otp, userId)
+          res.json({ message: "Check your email", status: true })
+        })
+
+      }
+
+    })
+  } catch (error) {
+    res.json({ message: error, status: false })
+  }
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
 
 const resetPassword = async (req, res) => {
-  const { id, otp, password, confirmPassword } = req.body;
-  if (password !== confirmPassword) {
-    return res.json({ message: "Passwords do not match", status: false })
-  }
-  Users.findByUserId(id, (err, result) => {
-    if (err) return res.json({ message: err, status: false })
-    if (result.length == 0) return res.json({ message: "User not found", status: false })
-    console.log(result[0].otp, otp, "sdf")
-    if (result[0].otp != otp) return res.json({ message: "Bad request", status: false })
-    Users.updatePassword(id, password, (err, result) => {
-      if (err) return res.json({ message: "Bad request", status: false })
-      console.log(result)
-      return res.json({ message: "Password updated successfully", status: true })
+  try {
+    const { id, otp, password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+      return res.json({ message: "Passwords do not match", status: false })
+    }
+    Users.findByUserId(id, (err, result) => {
+
+      if (result.length) {
+        if ((result[0].otp == otp) && (result[0].otp_status == true)) {
+          Users.updatePassword(id, password, (err, result) => {
+            if (err) return res.json({ message: "Bad request", status: false })
+            Users.updateOTP(data = { otp: 0, userId: id, status: false }, async function (err, result) {
+
+
+              return res.json({ message: "Password updated successfully", status: true })
+            })
+
+          })
+
+        }
+        else {
+          return res.json({ message: "Token expire", status: false })
+        }
+      }
+
+
     })
-  })
+
+  } catch (error) {
+    return res.json({ message: error, status: false })
+  }
 }
+
+
+
+
+
+
+
+
 
 const loginWithGoogle = async (req, res) => {
   try {
     const goggle = new Google();
     const authUrl = goggle.login();
-    console.log(authUrl);
     res.redirect(authUrl)
   } catch (error) {
-    console.log(error);
-    res.json(error)
+    res.json({ message: error, status: false })
   }
 }
 
+
+
+
+
+
+
+
 const getAccessToken = async (req, res) => {
   try {
-    console.log(req.query)
+
     const google = new Google();
     const result = await google.getAccessToken(req.query);
-    const { name, email } = jwt_decode(result.id_token);
-    // res.redirect(`http://localhost:3000/google?access_token=${result.access_token}&id_token=${result.id_token}`)
-    Users.findByEmail(email, async function (err, result) {
+    const googleData = jwt_decode(result.id_token);
+
+    Users.findByEmail(googleData.email, async function (err, result) {
       if (err) { res.json({ message: err, status: false }) }
       else {
         if (result.length > 0) {
-          const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: "" })
-          return res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
+         const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
+          res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
 
         }
-        Users.create({ firstname: name, lastname: "", email, password: "", balance: 0, otp: "", status: true, interest: "" }, async function (err, result) {
-          if (err) { return res.send({ message: err, status: false }) }
-          console.log(result, "THISIS RESULT")
-          const accessToken = await generateAccessToken({ userId: result.rows[0].id, email, password: "" })
-          return res.json({ message: "Login successfully done", status: true, token: accessToken, id: result.rows[0].id })
-        })
+        else {
+       
+          Users.create({ firstname: googleData.given_name, lastname: googleData.family_name, email: googleData.email, password: googleData.at_hash, balance: 0, otp: 0, status: true, interest: 0, role_type: "user" }, async function (err, RESULT) {
+            if (err) { res.send({ message: err, status: false }) }
+            if (RESULT.command == 'INSERT') {
+              Users.findByEmail(googleData.email, async (err, result) => {
+                if (err) { res.send({ message: "something went wrong" }) }
+                if (result.length > 0) {
+                  const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
+                  res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
+                }
+
+
+              })
+
+            }
+
+          })
+        }
+
       }
 
     })
-  } catch (error) {
-    console.log(error);
+  }
+  catch (error) {
+
     res.json(error)
   }
 }
 
 module.exports = {
-  Registration, Login, getAccessToken, loginWithGoogle, transaction, createTransaction, getUser, verifyOtp, forgotPassword, resetPassword
+  Registration, Login, getAccessToken, loginWithGoogle, getUser, verifyOtp, forgotPassword, resetPassword
 }
 
 

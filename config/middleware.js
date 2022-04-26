@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken")
 const { Users } = require("../model/model")
 const { getToken, verifyJWTToken, decodeToken } = require("./main")
 const bcrypt = require("bcrypt")
-
+ 
 
 
 //Authentification
