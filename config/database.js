@@ -20,10 +20,7 @@
 
 // const db =new Pool({
 
-//   connectionString: "postgres://syxxmocrgidpah:2f92eaddcc7ef565b3003feb54699a106832e56e02cd53dd4278196540585c1b@ec2-3-229-252-6.compute-1.amazonaws.com:5432/d56neva7h5jtna"
-// })
 
-// // module.exports=db
 const Pool = require('pg').Pool
 const db = new Pool({
   user: 'postgres',

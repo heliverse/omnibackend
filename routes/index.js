@@ -16,7 +16,6 @@ const Users = require('../model/user');
 router.use(urlencodedParser)
 
 //admin api
-// router.get("/auth/admin/transaction", auth, transaction.transaction)
 router.post("admin/login", Admin.Login)
 
 router.post("/admin/registration", Admin.create)
@@ -32,6 +31,7 @@ router.get("/admin/auth/getuser:id", user.GetOneUser)
 
 //users api
 
+router.get("/auth/transaction", auth, transaction.transaction)
 router.get("/auth/user", auth, user.getUser)
 
 
