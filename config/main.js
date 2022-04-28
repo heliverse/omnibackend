@@ -87,7 +87,7 @@ exports.getToken = async (req) => {
 }
 
 exports.sendEmail = (address, otp, user) => {
-    console.log(address)
+
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
@@ -99,7 +99,7 @@ exports.sendEmail = (address, otp, user) => {
         ],
         subject: "Your One-Time-Password",
     };
-    sendSmtpEmail.htmlContent = "<html><body><h1>Omnifi</h1>Please click on the below button to verify your email<br><a  href={{params.link}} >Verify Email</a></body></html>";
+    sendSmtpEmail.htmlContent = "<html><body><h1>Omnifi</h1>Please click on the below button to verify your email<br> <a  href={{params.link}} >Verify Email</a></body></html>";
     sendSmtpEmail.params = { "otp": otp, link: 'http://localhost:3000/verify-otp/' + user.id + "/" + otp };
     apiInstance.sendTransacEmail(sendSmtpEmail).then(
         function (data) {

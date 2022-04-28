@@ -15,11 +15,8 @@ const auth = async (req, res, next) => {
         if (token) {
             const TokenData = await decodeToken(token)
             const { email, role } = TokenData.user
-           
             switch (role) {
-                
                 case "admin": {
-
                     Users.findByEmail(email, async function (err, result) {
                         if (err) {
                             res.json({ message: err, status: false })
@@ -34,22 +31,23 @@ const auth = async (req, res, next) => {
                     })
                     break;
                 }
-                default: {
+                case "user": {
                     Users.findByEmail(email, async function (err, result) {
                         if (err) {
                             res.send(err)
                         }
                         if (result.length > 0 && result[0].role_type == "user") {
-
-                            next()
+                 
+                             next()
                         }
                         else {
                             res.status(400).json({ message: "unauthorize access", status: false })
                         }
                     })
-
-
-
+                    break;
+                }
+                default: {
+                    res.status(400).json({ message: "unauthorize access", status: false })
                 }
             }
 

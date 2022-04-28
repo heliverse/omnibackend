@@ -63,7 +63,7 @@ const Login = async (req, res) => {
           if (result[0].status == false) return res.json({ message: "Please verify your email.", status: false })
           const match = await bcrypt.compare(password, result[0].password)
           if (match) {
-            const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
+            const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password,role:result[0].role_type })
             res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
           }
           else {

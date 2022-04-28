@@ -9,7 +9,23 @@ let { generatePassword } = require("../config/main")
 let Transaction = function (transaction) {
     this.amount = transaction.amount;
     this.user = transaction.user;
-    this.status = transaction.status;
+    this.transaction_type = transaction.type;
+    this.status ="awaiting"
+}
+
+
+
+Transaction.add = (Data, callback) => {
+console.log(Data)
+    connection.query('INSERT INTO transactions (user_id,amount,transaction_type,status) VALUES ($1,$2,$3,$4)', [Data.user, Data.amount,Data.transaction_type, Data.status], (error, result) => {
+        if (error) {
+            callback( error,null)
+            console.log(error)
+        }
+        else {
+            callback(null, result)
+        }
+    })
 }
 
 
@@ -31,21 +47,6 @@ Transaction.findAll = (callback) => {
 
 
 
-
-
-
-Transaction.add = (Data, callback) => {
-
-    connection.query('INSERT INTO transactions (user_id,amount,status) VALUES ($1, $2,$3) ', [Data.user, Data.amount, Data.status], (error, result) => {
-        if (error) {
-            callback( error,null)
-        }
-        else {
-
-            callback(null, result)
-        }
-    })
-}
 
 
 
