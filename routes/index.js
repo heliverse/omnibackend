@@ -21,6 +21,7 @@ router.post("/admin/login", Admin.Login)
 router.post("/admin/auth/transaction",auth, Admin.createTransaction)
 router.get("/admin/auth/getuser", user.GetAllUser)
 router.get("/admin/auth/getuser/:id", user.GetOneUser)
+router.get("/admin/transaction",  Admin.transaction)
 
 
 

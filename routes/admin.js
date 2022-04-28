@@ -65,9 +65,35 @@ const Login = async (req, res) => {
 
 }
 
+const transaction = async (req, res) => {
+    try {
+        const id =req.body.id
+      
 
-const createTransaction = async (req, res) => {
+        Transaction.findByUserId(id, async function (err, result) {
+          if (err) {
+            res.json({ message: err, status: false })
+          }
+          else {
+            res.send({ data: result, status: true })
+  
+          }
+        })
+      
+  
+    } catch (error) {
+        console.log(error)
+        res.json({message:error,status:false})
 
+  
+    }
+  
+  }
+
+
+  
+  const createTransaction = async (req, res) => {
+      
     try {
         const data = await new Transaction(req.body)
         data.user = parseInt(req.query.id)
@@ -118,4 +144,6 @@ const createTransaction = async (req, res) => {
     }
 }
 
-module.exports = { create, Login, createTransaction }
+module.exports = { create, Login, createTransaction, transaction }
+
+    //   module.exports = { create ,Login, transaction}

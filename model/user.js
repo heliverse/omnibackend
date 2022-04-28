@@ -178,8 +178,9 @@ Users.updatePassword = async (Id, pass, callback) => {
 Users.update = (data, callback) => {
 
     connection.query("UPDATE users SET balance=($2),last_transactions_time=($3),interest=($4) WHERE (id)=($1)", [data.id, data.balance, data.last_transactions_time, data.interest], (error, result) => {
+        console.log(data,result)
         if (error) {
-            callback(null, error)
+            callback(error, null)
 
         } else {
             callback(null, result)
