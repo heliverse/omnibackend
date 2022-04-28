@@ -18,7 +18,7 @@ router.use(urlencodedParser)
 //admin api
 // router.get("/auth/admin/transaction", auth, transaction.transaction)
 router.post("/admin/login", Admin.Login)
-router.post("/admin/auth/transaction", Admin.createTransaction)
+router.post("/admin/auth/transaction",auth, Admin.createTransaction)
 router.get("/admin/auth/getuser", user.GetAllUser)
 router.get("/admin/auth/getuser/:id", user.GetOneUser)
 

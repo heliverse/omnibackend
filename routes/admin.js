@@ -34,19 +34,19 @@ const create = async (req, res) => {
 const Login = async (req, res) => {
     try {
         const { email, password } = req.body
-        console.log(email,password)
+
         Users.findByEmail(email, async function (err, result) {
             if (err) {
                 res.json({ message: "Bad reruest", status: false })
             }
             else {
-                console.log(result)
-                if (result.length > 0 && result[0].role_type =="admin") {
+
+                if (result.length > 0 && result[0].role_type == "admin") {
 
                     if (result[0].status == false) return res.json({ message: "Please verify your email.", status: false })
                     const match = await bcrypt.compare(password, result[0].password)
                     if (match) {
-                        const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password,role:result[0].role_type })
+                        const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password, role: result[0].role_type })
                         res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
                     }
                     else {
@@ -72,7 +72,6 @@ const createTransaction = async (req, res) => {
         const data = await new Transaction(req.body)
         data.user = parseInt(req.query.id)
 
-
         Transaction.add(data, function (err, result) {
             if (err) {
                 res.send({ message: "not add", status: false })
@@ -82,7 +81,9 @@ const createTransaction = async (req, res) => {
                 if (result.command == "INSERT") {
 
                     Users.findByUserId(req.query.id, async function (err, RESULT) {
+                       
                         if (RESULT.length) {
+                         
                             AVERAGETIME({ oldTime: RESULT[0].last_transactions_time, oldInterest: RESULT[0].interest, oldBalance: RESULT[0].balance, newBalance: data.amount, status: data.status, id: RESULT[0].id }, async (err, result) => {
                                 if (result.error) {
                                     res.json({ message: result.error, status: false })
