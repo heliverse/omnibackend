@@ -20,7 +20,7 @@ Users.create = async (Data, callback) => {
     const password = await generatePassword(Data.password)
     connection.query('INSERT INTO users (firstname,lastname,email,password,balance, authentication_key,status,interest,role_type) VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status, Data.interest,Data.role_type], (error, result) => {
         if (error) {
-            callback(null, error)
+            callback(error, null)
         }
         else {
 
@@ -51,13 +51,18 @@ Users.findByEmail = (Email, callback) => {
 
 }
 
+Users.findAdminByEmail = (Email, callback) => {
+    connection.query("select * from Admin where (email) = ($1)", [Email], (error, result) => {
+        if (error) {
+            callback(error, null)
+        }
+        else {
 
+            callback(null, result.rows)
+        }
+    })
 
-
-
-
-
-
+}
 
 
 Users.delete = (Email) => {
@@ -85,11 +90,11 @@ Users.findByUserId = (Id, callback) => {
     console.log(Id)
     connection.query("select * from users where (id) = ($1)", [Id], (error, result) => {
         if (error) {
-            callback(null, error)
+            callback(error, null)
         }
         else {
 
-            callback(null, result.rows)
+            callback(null, result.rows[0])
         }
     })
 
@@ -198,7 +203,7 @@ Users.findAll = (callback) => {
 
     connection.query("select * from users", (error, result) => {
         if (error) {
-            callback(null, error)
+            callback(error, null)
         }
         else {
             callback(null, result.rows)

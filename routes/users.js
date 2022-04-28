@@ -130,36 +130,38 @@ const getUser = async (req, res) => {
 
 const GetAllUser = async (req, res) => {
   try {
-    const token = await getToken(req.body)
-
-    Users.findAll(token, function (err, result) {
+    Users.findAll( function (err, result) {
       if (err) {
-
+        console.log(err)
+        res.status(500).json({message:error,status:false})
       }
       res.json(result)
     })
 
 
   } catch (error) {
-
+    console.log(error)
+    res.status(500).json({message:error,status:false})
   }
 }
 
 const GetOneUser = async (req, res) => {
   try {
 
-    const TokenData = req.body
+    const TokenData = req.params
     if (TokenData) {
       Users.findByUserId(TokenData.id, function (err, result) {
         if (err) {
-
+          console.log(err)
+          return res.json({message:"Bad Request", status:false})
         }
         res.json(result)
       })
     }
 
   } catch (error) {
-
+    console.log(error)
+    res.json({message:error,status:false})
   }
 }
 
