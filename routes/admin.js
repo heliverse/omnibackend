@@ -2,6 +2,7 @@ const { generateOTP, generateAccessToken } = require("../config/main")
 const Admin = require("../model/admin")
 const Users = require("../model/user")
 const bcrypt = require("bcrypt")
+const Transaction =require("../model/transaction")
 
 
 
@@ -61,5 +62,30 @@ const Login = async (req, res) => {
 
 }
 
+const transaction = async (req, res) => {
+    try {
+        const id =req.body.id
+      
 
-module.exports = { create ,Login}
+        Transaction.findByUserId(id, async function (err, result) {
+          if (err) {
+            res.json({ message: err, status: false })
+          }
+          else {
+            res.send({ data: result, status: true })
+  
+          }
+        })
+      
+  
+    } catch (error) {
+        console.log(error)
+        res.json({message:error,status:false})
+
+  
+    }
+  
+  }
+
+
+module.exports = { create ,Login, transaction}

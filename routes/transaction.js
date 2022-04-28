@@ -53,6 +53,7 @@ const createTransaction = async (req, res) => {
       })
   
     } catch (error) {
+      console.log(error)
   
       res.json({ message: error, status: false, })
     }
