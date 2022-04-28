@@ -4,7 +4,6 @@ const Admin = require("../model/admin")
 const Users = require("../model/user")
 const Transaction = require("../model/transaction")
 const bcrypt = require("bcrypt")
-const Transaction =require("../model/transaction")
 
 
 
@@ -92,9 +91,9 @@ const transaction = async (req, res) => {
   }
 
 
-module.exports = { create ,Login, transaction}
-const createTransaction = async (req, res) => {
-
+  
+  const createTransaction = async (req, res) => {
+      
     try {
         const data = await new Transaction(req.body)
         data.user = parseInt(req.query.id)
@@ -145,4 +144,6 @@ const createTransaction = async (req, res) => {
     }
 }
 
-module.exports = { create, Login, createTransaction }
+module.exports = { create, Login, createTransaction, transaction }
+
+    //   module.exports = { create ,Login, transaction}
