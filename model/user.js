@@ -11,14 +11,14 @@ const Users = function (user) {
     this.otp = user.otp;
     this.status = user.status
     this.interest = 0;
-    this.role_type="user"
+    this.role_type="admin"
 }
 
 
 
 Users.create = async (Data, callback) => {
     const password = await generatePassword(Data.password)
-    connection.query('INSERT INTO users (firstname,lastname,email,password,balance,otp,status,interest,role_type) VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status, Data.interest,Data.role_type], (error, result) => {
+    connection.query('INSERT INTO users (firstname,lastname,email,password,balance, authentication_key,status,interest,role_type) VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9) RETURNING id', [Data.firstname, Data.lastname, Data.email, password, Data.balance, Data.otp, Data.status, Data.interest,Data.role_type], (error, result) => {
         if (error) {
             callback(null, error)
         }
@@ -38,12 +38,8 @@ Users.create = async (Data, callback) => {
 
 
 
-
-
-
-
 Users.findByEmail = (Email, callback) => {
-    connection.query("select * from Admin where (email) = ($1)", [Email], (error, result) => {
+    connection.query("select * from users where (email) = ($1)", [Email], (error, result) => {
         if (error) {
             callback(error, null)
         }
@@ -86,6 +82,7 @@ Users.delete = (Email) => {
 
 
 Users.findByUserId = (Id, callback) => {
+    console.log(Id)
     connection.query("select * from users where (id) = ($1)", [Id], (error, result) => {
         if (error) {
             callback(null, error)

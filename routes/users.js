@@ -21,7 +21,9 @@ const Registration = async (req, res) => {
         if (result.length > 0 && result[0].status == false) await Users.delete(data.email)
         Users.create(data, function (err, result) {
           if (err) { return res.send({ message: err, status: false }) }
-          sendEmail(data.email, otp, result.rows[0])
+
+          console.log(result)
+          // sendEmail(data.email, otp, result.rows[0])
           res.json({ message: "User registration successfull", status: true })
         })
       }
@@ -204,7 +206,8 @@ const forgotPassword = async (req, res) => {
       else {
         let otp = await generateOTP();
         // otp = await generatePassword(otp)
-        const userId = result[0].id;
+         const userId = result[0].id;
+console.log(result)
         Users.updateOTP(data = { otp, userId, status: true }, async function (err, result) {
           sendEmailForgotpassword(EMAIL, otp, userId)
           res.json({ message: "Check your email", status: true })
