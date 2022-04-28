@@ -35,11 +35,12 @@ Transaction.findAll = (callback) => {
 
 
 Transaction.add = (Data, callback) => {
-console.log({Data})
+
     connection.query('INSERT INTO transactions (user_id,amount,status) VALUES ($1, $2,$3) ', [Data.user, Data.amount, Data.status], (error, result) => {
         if (error) {
             callback(error, null)
             console.log(error)
+            callback( error,null)
         }
         else {
 
