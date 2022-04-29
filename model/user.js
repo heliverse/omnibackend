@@ -85,14 +85,14 @@ Users.delete = (Email) => {
 
 
 Users.findByUserId = (Id, callback) => {
-
+console.log(Id)
     connection.query("select id,firstname,lastname,role_type,email,balance,interest,last_transaction_time,status,is_confirmed from users where (id) = ($1) ", [Id], (error, result) => {
         if (error) {
             callback(error, null)
         }
         else {
 
-            callback(null, result.rows)
+            console.log(null, result.rows)
         }
     })
 

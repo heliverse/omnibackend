@@ -18,38 +18,43 @@ router.use(urlencodedParser)
 //admin api
 // router.get("/auth/admin/transaction", auth, transaction.transaction)
 router.post("/admin/login", Admin.Login)
-router.post("/admin/auth/transaction",auth, Admin.createTransaction)
-router.get("/admin/auth/getuser", user.GetAllUser)
-router.get("/admin/auth/getuser/:id", user.GetOneUser)
-router.get("/admin/transaction",  Admin.transaction)
+
+router.post("/admin/auth/transaction/:user/:transaction",auth, Admin.updateTransaction)
+
+router.get("/admin/auth/getuser",auth, user.GetAllUser)
+
+router.get("/admin/auth/getuser",auth, user.GetOneUser)
+
+router.get("/admin/auth/transaction", auth, Admin.transactionOneUser)
 
 
 
 
 
 
-//users api
-
-router.get("/auth/transaction", auth, transaction.transaction)
+//users login  api
+router.post('/registration', user.Registration)
+router.post("/login", user.Login)
 router.get("/auth/user", auth, user.getUser)
 
 
-router.post('/registration', user.Registration)
-router.post("/login", user.Login)
+
+//transaction apis
+router.post("/auth/transaction", auth, transaction.createTransaction)
+router.get("/auth/transaction", auth, transaction.transaction)
+
+
+//users services
 router.get('/verify-otp/:id/:otp', user.verifyOtp)
 router.post("/forgotPassword", user.forgotPassword);
 router.post("/resetPassword", user.resetPassword);
+
+
+
+
+//google login apis
 router.get('/login/google', user.loginWithGoogle)
 router.get('/google/callback', user.getAccessToken);
-
-
-
-
-
-//transaction api
-router.post("/auth/transaction", auth, transaction.createTransaction)
-
-
 
 
 module.exports = router;

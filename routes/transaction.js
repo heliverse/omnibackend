@@ -91,7 +91,6 @@ const transaction = async (req, res) => {
 
     const token = await getToken(req)
     const TokenData = decodeToken(token)
-    console.log(TokenData.user.userId)
     if (TokenData) {
       Transaction.findByUserId(TokenData.user.userId, async function (err, result) {
         if (err) {
@@ -99,7 +98,6 @@ const transaction = async (req, res) => {
         }
         else {
           res.send({ data: result, status: true })
-
         }
       })
     }

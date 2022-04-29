@@ -65,11 +65,17 @@ const Login = async (req, res) => {
 
 }
 
-const transaction = async (req, res) => {
+
+
+
+
+
+
+
+
+const transactionOneUser = async (req, res) => {
     try {
-        const id = req.body.id
-
-
+        const id = req.query.id
         Transaction.findByUserId(id, async function (err, result) {
             if (err) {
                 res.json({ message: err, status: false })
@@ -81,7 +87,7 @@ const transaction = async (req, res) => {
         })
 
     } catch (error) {
-  
+
         res.json({ message: error, status: false })
 
 
@@ -91,58 +97,35 @@ const transaction = async (req, res) => {
 
 
 
-const createTransaction = async (req, res) => {
-
+const updateTransaction = async (req, res) => {
     try {
+        const {amount,status,time} =req.body
+        const { user, transaction } = req.params
+        Users.findByUserId(user, async (err, UserResults) => {
 
-        data.user = parseInt(req.query.id)
-
-        Transaction.add(data, function (err, result) {
-            if (err) {
-                res.send({ message: "not add", status: false })
-            }
+            if (err) { res.json({ message: "user not find", status: true }) }
             else {
+                if (UserResults.length > 0) {
 
-                if (result.command == "INSERT") {
-
-                    Users.findByUserId(req.query.id, async function (err, RESULT) {
-
-                        if (RESULT.length) {
-
-                            AVERAGETIME({ oldTime: RESULT[0].last_transactions_time, oldInterest: RESULT[0].interest, oldBalance: RESULT[0].balance, newBalance: data.amount, status: data.status, id: RESULT[0].id }, async (err, result) => {
-                                if (result.error) {
-                                    res.json({ message: result.error, status: false })
-                                }
-                                else {
-                                    Users.update(result, async function (err, result) {
-
-                                        if (result.command == "UPDATE") {
-                                            res.send({ message: "Transaction successfully done", status: true })
-                                        }
-                                        else {
-                                            res.send({ message: "Transaction successfully not done", status: true })
-                                        }
-                                    })
-                                }
-
-                            })
-                        }
-                    })
+console.log(UserResults)
                 }
-                else {
-                    res.json({ message: result, status: false })
-                }
+
+
+
+
             }
 
 
         })
 
+
+
+
     } catch (error) {
 
-        res.json({ message: error, status: false, })
     }
 }
 
-module.exports = { create, Login, createTransaction, transaction }
+module.exports = { create, Login, updateTransaction, transactionOneUser }
 
     //   module.exports = { create ,Login, transaction}
