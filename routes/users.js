@@ -21,9 +21,7 @@ const Registration = async (req, res) => {
         if (result.length > 0 && result[0].status == false) await Users.delete(data.email)
         Users.create(data, function (err, result) {
           if (err) { return res.send({ message: err, status: false }) }
-
-          console.log(result)
-          // sendEmail(data.email, otp, result.rows[0])
+          sendEmail(data.email, otp, result.rows[0])
           res.json({ message: "User registration successfull", status: true })
         })
       }
@@ -167,12 +165,15 @@ const GetOneUser = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { id, otp } = req.params
+    const OTP =generateOTP()
     Users.findByUserId(id, (err, result) => {
+      console.log({result})
       if (err) return res.json({ message: err, status: false })
       if (result.length == 0) return res.json({ message: "User not found", status: false })
       if (result[0].status == true) return res.json({ message: "User already verified", status: true })
       if (result[0].authentication_key != otp) return res.json({ message: "Invalid OTP", status: false })
-      Users.updateStatus(id, (err, result) => {
+      
+      Users.updateStatus(id,OTP, (err, result) => {
         if (err) return res.json({ message: "Bad request", status: false })
         // console.log("-------", result, "-------")
         return res.json({ message: "Otp verified successfully", status: true })

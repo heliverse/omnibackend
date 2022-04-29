@@ -9,8 +9,6 @@ const jwtConfig = {
     expireTime: 30 * 60,
     refreshTokenExpireTime: 30 * 60 * 60
 }
-
-
 const apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = "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";
 
@@ -87,11 +85,11 @@ exports.getToken = async (req) => {
 }
 
 exports.sendEmail = (address, otp, user) => {
-
+console.log(address, otp, user)
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
-        sender: { email: "support@heliverse" },
+        sender: { email: "abdul@heliverse" },
         to: [
             {
                 email: address,
@@ -116,7 +114,7 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
-        sender: { email: "support@heliverse.com" },
+        sender: { email: "abdul@heliverse.com" },
         to: [
             {
                 email: address,
