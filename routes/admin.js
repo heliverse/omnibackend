@@ -67,35 +67,34 @@ const Login = async (req, res) => {
 
 const transaction = async (req, res) => {
     try {
-        const id =req.body.id
-      
+        const id = req.body.id
+
 
         Transaction.findByUserId(id, async function (err, result) {
-          if (err) {
-            res.json({ message: err, status: false })
-          }
-          else {
-            res.send({ data: result, status: true })
-  
-          }
+            if (err) {
+                res.json({ message: err, status: false })
+            }
+            else {
+                res.send({ data: result, status: true })
+
+            }
         })
-      
-  
+
     } catch (error) {
-        console.log(error)
-        res.json({message:error,status:false})
-
   
+        res.json({ message: error, status: false })
+
+
     }
-  
-  }
+
+}
 
 
-  
-  const createTransaction = async (req, res) => {
-      
+
+const createTransaction = async (req, res) => {
+
     try {
-        const data = await new Transaction(req.body)
+
         data.user = parseInt(req.query.id)
 
         Transaction.add(data, function (err, result) {
@@ -107,9 +106,9 @@ const transaction = async (req, res) => {
                 if (result.command == "INSERT") {
 
                     Users.findByUserId(req.query.id, async function (err, RESULT) {
-                       
+
                         if (RESULT.length) {
-                         
+
                             AVERAGETIME({ oldTime: RESULT[0].last_transactions_time, oldInterest: RESULT[0].interest, oldBalance: RESULT[0].balance, newBalance: data.amount, status: data.status, id: RESULT[0].id }, async (err, result) => {
                                 if (result.error) {
                                     res.json({ message: result.error, status: false })

@@ -50,13 +50,13 @@ Users.findByEmail = (Email, callback) => {
 }
 
 Users.findAdminByEmail = (Email, callback) => {
-    connection.query("select * from Admin where (email) = ($1)", [Email], (error, result) => {
+    connection.query("select * from Admin where (email) = ($1) RETURNING id", [Email], (error, result) => {
         if (error) {
             callback(error, null)
         }
         else {
 
-            callback(null, result.rows)
+            // callback(null, result.rows)
         }
     })
 
@@ -86,7 +86,7 @@ Users.delete = (Email) => {
 
 Users.findByUserId = (Id, callback) => {
 
-    connection.query("select * from users where (id) = ($1)", [Id], (error, result) => {
+    connection.query("select id,firstname,lastname,role_type,email,balance,interest,last_transaction_time,status,is_confirmed from users where (id) = ($1) ", [Id], (error, result) => {
         if (error) {
             callback(error, null)
         }
@@ -191,17 +191,9 @@ Users.update = (data, callback) => {
 }
 
 
-
-
-
-
-
-
-
-
 Users.findAll = (callback) => {
 
-    connection.query("select * from users", (error, result) => {
+    connection.query("select id,firstname,lastname,role_type,email,balance,interest,last_transactions_time from users where role_type =($1)",["user"], (error, result) => {
         if (error) {
             callback(error, null)
         }
@@ -210,6 +202,5 @@ Users.findAll = (callback) => {
         }
     })
 }
-
 
 module.exports = Users 

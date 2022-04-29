@@ -63,7 +63,7 @@ const Login = async (req, res) => {
           if (result[0].status == false) return res.json({ message: "Please verify your email.", status: false })
           const match = await bcrypt.compare(password, result[0].password)
           if (match) {
-            const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password,role:result[0].role_type })
+            const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password, role: result[0].role_type })
             res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
           }
           else {
@@ -114,11 +114,9 @@ const getUser = async (req, res) => {
     if (TokenData) {
       Users.findByEmail(TokenData.user.email, function (err, result) {
         if (err) {
-          // 
-
-
 
         }
+
         res.json(result)
       })
     }
@@ -130,18 +128,17 @@ const getUser = async (req, res) => {
 
 const GetAllUser = async (req, res) => {
   try {
-    Users.findAll( function (err, result) {
+    Users.findAll(function (err, result) {
       if (err) {
-        console.log(err)
-        res.status(500).json({message:error,status:false})
+        // res.status(500).json({ message: error, status: false })
       }
       res.json(result)
     })
 
 
   } catch (error) {
-    console.log(error)
-    res.status(500).json({message:error,status:false})
+
+    res.status(500).json({ message: error, status: false })
   }
 }
 
@@ -152,16 +149,15 @@ const GetOneUser = async (req, res) => {
     if (TokenData) {
       Users.findByUserId(TokenData.id, function (err, result) {
         if (err) {
-          console.log(err)
-          return res.json({message:"Bad Request", status:false})
+
+          return res.json({ message: "Bad Request", status: false })
         }
         res.json(result)
       })
     }
 
   } catch (error) {
-    console.log(error)
-    res.json({message:error,status:false})
+    res.json({ message: error, status: false })
   }
 }
 
@@ -175,7 +171,7 @@ const verifyOtp = async (req, res) => {
       if (err) return res.json({ message: err, status: false })
       if (result.length == 0) return res.json({ message: "User not found", status: false })
       if (result[0].status == true) return res.json({ message: "User already verified", status: true })
-      if (result[0].otp != otp) return res.json({ message: "Invalid OTP", status: false })
+      if (result[0].authentication_key != otp) return res.json({ message: "Invalid OTP", status: false })
       Users.updateStatus(id, (err, result) => {
         if (err) return res.json({ message: "Bad request", status: false })
         // console.log("-------", result, "-------")
@@ -208,8 +204,8 @@ const forgotPassword = async (req, res) => {
       else {
         let otp = await generateOTP();
         // otp = await generatePassword(otp)
-         const userId = result[0].id;
-console.log(result)
+        const userId = result[0].id;
+        
         Users.updateOTP(data = { otp, userId, status: true }, async function (err, result) {
           sendEmailForgotpassword(EMAIL, otp, userId)
           res.json({ message: "Check your email", status: true })
@@ -343,7 +339,7 @@ const getAccessToken = async (req, res) => {
 }
 
 module.exports = {
-  Registration, Login, getAccessToken, loginWithGoogle, getUser, verifyOtp, forgotPassword, resetPassword,GetAllUser,GetOneUser
+  Registration, Login, getAccessToken, loginWithGoogle, getUser, verifyOtp, forgotPassword, resetPassword, GetAllUser, GetOneUser
 }
 
 
