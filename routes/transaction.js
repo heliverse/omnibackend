@@ -12,7 +12,7 @@ const createTransaction = async (req, res) => {
     const TokenData = decodeToken(token)
     data.user = TokenData.user.userId
 
-    switch (req.body.type) {
+    switch (req.body.status) {
       case "deposit": {
         Transaction.add(data, function (err, result) {
           if (err) {

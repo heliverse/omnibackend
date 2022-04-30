@@ -9,7 +9,7 @@ let { generatePassword } = require("../config/main")
 let Transaction = function (transaction) {
     this.amount = transaction.amount;
     this.user = transaction.user;
-    this.transaction_type = transaction.type;
+    this.transaction_type = transaction.status;
     this.status ="awaiting"
 }
 
