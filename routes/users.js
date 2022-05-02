@@ -128,8 +128,9 @@ const GetAllUser = async (req, res) => {
   try {
     Users.findAll(function (err, result) {
       if (err) {
-        // res.status(500).json({ message: error, status: false })
+        res.status(500).json({ message: error, status: false })
       }
+      console.log(result)
       res.json(result)
     })
 
