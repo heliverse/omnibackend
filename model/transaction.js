@@ -89,7 +89,7 @@ Transaction.update = (data, callback) => {
 
 Transaction.findByUserId = (Userid, callback) => {
 
-    connection.query("select * from transactions where (user_id) =($1) ", [Userid], (error, result) => {
+    connection.query("select * from transactions where (user_id) =($1) ORDER BY id DESC  ", [Userid], (error, result) => {
         if (error) {
 
             callback(error,null)

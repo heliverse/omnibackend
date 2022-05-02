@@ -1,7 +1,7 @@
 const jwt_decode = require("jwt-decode");
 const bcrypt = require("bcrypt")
 const Google = require('../services/Google')
-const { Users} = require("../model/model");
+const { Users } = require("../model/model");
 const { getToken, decodeToken, AVERAGETIME, generatePassword, generateOTP, generateAccessToken, sendEmail, sendEmailForgotpassword } = require("../config/main");
 
 
@@ -62,7 +62,7 @@ const Login = async (req, res) => {
           const match = await bcrypt.compare(password, result[0].password)
           if (match) {
             const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password, role: result[0].role_type })
-            res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id,user_type: result[0].role_type})
+            res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id, user_type: result[0].role_type })
           }
           else {
             res.json({ message: "Password  not match", status: false })
@@ -112,7 +112,7 @@ const getUser = async (req, res) => {
     if (TokenData) {
       Users.findByEmail(TokenData.user.email, function (err, result) {
         if (err) {
-
+          res.json({ message: err, status: false })
         }
 
         res.json(result)
@@ -120,7 +120,7 @@ const getUser = async (req, res) => {
     }
 
   } catch (error) {
-
+    res.json({ message: error, status: false })
   }
 }
 
@@ -128,16 +128,16 @@ const GetAllUser = async (req, res) => {
   try {
     Users.findAll(function (err, result) {
       if (err) {
-        res.status(500).json({ message: error, status: false })
+        res.json({ message: error, status: false })
       }
-      console.log(result)
+
       res.json(result)
     })
 
 
   } catch (error) {
 
-    res.status(500).json({ message: error, status: false })
+    res.json({ message: error, status: false })
   }
 }
 
@@ -166,13 +166,13 @@ const GetOneUser = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { id, otp } = req.params
-    const OTP =generateOTP()
+    const OTP = generateOTP()
     Users.findByUserId(id, (err, result) => {
       if (err) return res.json({ message: err, status: false })
       if (result.length == 0) return res.json({ message: "User not found", status: false })
       if (result[0].status == true) return res.json({ message: "User already verified", status: true })
       if (result[0].authentication_key != otp) return res.json({ message: "Invalid OTP", status: false })
-      Users.updateStatus(id,OTP, (err, result) => {
+      Users.updateStatus(id, OTP, (err, result) => {
         if (err) return res.json({ message: "Bad request", status: false })
         // console.log("-------", result, "-------")
         return res.json({ message: "Otp verified successfully", status: true })
@@ -205,7 +205,7 @@ const forgotPassword = async (req, res) => {
         let otp = await generateOTP();
         // otp = await generatePassword(otp)
         const userId = result[0].id;
-        
+
         Users.updateOTP(data = { otp, userId, status: true }, async function (err, result) {
           sendEmailForgotpassword(EMAIL, otp, userId)
           res.json({ message: "Check your email", status: true })

@@ -3,7 +3,8 @@ const { InterestCalculate } = require("../config/main");
 const Admin = require("../model/admin")
 const Users = require("../model/user")
 const Transaction = require("../model/transaction")
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const { assuredworkloads } = require("googleapis/build/src/apis/assuredworkloads");
 
 
 
@@ -96,6 +97,121 @@ const transactionOneUser = async (req, res) => {
 }
 
 
+const createTransacction = async (req, res) => {
+
+
+    try {
+        const DATA = req.body
+        switch (DATA.type) {
+            case "deposit": {
+
+                Users.findByUserId(DATA.userId, async (err, UserResults) => {
+                    if (err) { res.json({ message: "user not find", status: true }) }
+                    else {
+                        if (UserResults.length > 0) {
+
+                            InterestCalculate(data = { oldBalance: UserResults[0].balance, oldTime: UserResults[0].last_transactions_time, oldInterest: UserResults[0].interest, newBalance: DATA.balance, newTime: new Date(), type: DATA.type }, async (err, RESULT) => {
+                                Users.update(data = { id: UserResults[0].id, balance: RESULT.balance, last_transactions_time: RESULT.last_transactions_time, interest: RESULT.interest }, async (err, result) => {
+
+                                    if (result) {
+
+                                        Transaction.add(data = { user: DATA.userId, amount: DATA.balance, transaction_type: DATA.type, status: "accept" }, async function (err, result) {
+                                            if (err) {
+                                                res.json({ message: err, status: false })
+                                            }
+                                            else {
+
+                                                if (result.command == "INSERT") {
+
+                                                    res.send({ message: "Transaction successfully done", status: true })
+
+                                                }
+                                                else {
+
+                                                    res.send({ message: "Transaction not successfully done", status: false })
+                                                }
+                                            }
+
+                                        })
+                                    }
+
+                                })
+
+
+
+                            })
+
+                        }
+                    }
+                })
+
+                break;
+            }
+            case "withdraw": {
+
+                Users.findByUserId(DATA.userId, async (err, UserResults) => {
+                    if (err) {
+                        res.json({ message: err, status: false })
+                    }
+                    else {
+                        if (UserResults.length > 0) {
+
+                            if (UserResults[0].balance < DATA.balance) {
+                                res.json({ message: "you have no sufficient balance", status: false })
+                            }
+                            else {
+                                InterestCalculate(data = { oldBalance: UserResults[0].balance, oldTime: UserResults[0].last_transactions_time, oldInterest: UserResults[0].interest, newBalance: DATA.balance, newTime: new Date(), type: DATA.type }, async (err, RESULT) => {
+                                    Users.update(data = { id: UserResults[0].id, balance: RESULT.balance, last_transactions_time: RESULT.last_transactions_time, interest: RESULT.interest }, async (err, result) => {
+
+                                        if (result) {
+
+                                            Transaction.add(data = { user: DATA.userId, amount: DATA.balance, transaction_type: DATA.type, status: "accept" }, async function (err, result) {
+                                                if (err) {
+                                                    res.json({ message: err, status: false })
+                                                }
+                                                else {
+
+                                                    if (result.command == "INSERT") {
+
+                                                        res.send({ message: "Transaction successfully done", status: true })
+
+                                                    }
+                                                    else {
+
+                                                        res.send({ message: "Transaction not successfully done", status: false })
+                                                    }
+                                                }
+
+                                            })
+                                        }
+
+                                    })
+
+
+
+                                })
+
+                            }
+
+                        }
+                    }
+                })
+
+                break;
+            }
+
+        }
+
+
+    } catch (error) {
+        res.send({ message: error, status: false })
+    }
+
+}
+
+
+
+
 
 const updateTransaction = async (req, res) => {
     try {
@@ -118,7 +234,7 @@ const updateTransaction = async (req, res) => {
                                             Transaction.update(payload = { status: DATA.status, balance: DATA.balance, id: DATA.transactionId }, async (err, result) => {
                                                 if (result.command == "UPDATE" && result.rowCount == 1) {
                                                     res.json({ message: "Transaction not Update ", status: true })
-                                                }else{
+                                                } else {
 
                                                     res.json({ message: "Transaction Update Successfull", status: false })
                                                 }
@@ -153,7 +269,7 @@ const updateTransaction = async (req, res) => {
                     if (result.command == "UPDATE" && result.rowCount == 1) {
                         res.json({ message: "Transaction Update Successfull", status: true })
                     }
-                    else{
+                    else {
 
                         res.json({ message: "transaction not update ", status: false })
                     }
@@ -169,11 +285,10 @@ const updateTransaction = async (req, res) => {
 
 
     } catch (error) {
-        res.json({message:error,status:false})
+        res.json({ message: error, status: false })
 
     }
 }
 
-module.exports = { create, Login, updateTransaction, transactionOneUser }
+module.exports = { create, Login, updateTransaction, transactionOneUser, createTransacction }
 
-  

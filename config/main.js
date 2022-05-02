@@ -159,10 +159,11 @@ exports.InterestCalculate = async (request, callback) => {
             }
             else {
 
-                const interest = CalculateInterest(DATA = { amount: request.oldBalance, oldTime: request.oldTime, newTime: request.newTime })
+                const interest = await CalculateInterest(DATA = { amount: request.oldBalance, oldTime: request.oldTime, newTime: request.newTime })
                 const Total = parseFloat(request.newBalance) + parseFloat(request.oldBalance)
                 const Interest = parseFloat(interest) + parseFloat(request.oldInterest)
                 const data = await { balance: Total, interest: Interest, last_transactions_time: request.newTime }
+                
                 callback(null, data)
 
             }

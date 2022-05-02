@@ -199,7 +199,7 @@ Users.update = (data, callback) => {
 
 Users.findAll = (callback) => {
 
-    connection.query("select id,firstname,lastname,role_type,email,balance,interest,last_transactions_time from users where role_type =($1)", ["user"], (error, result) => {
+    connection.query("select id,firstname,lastname,role_type,email,balance,interest,last_transactions_time from users where role_type =($1) ORDER BY id DESC ", ["user"], (error, result) => {
         if (error) {
             callback(error, null)
         }
