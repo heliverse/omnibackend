@@ -85,19 +85,19 @@ exports.getToken = async (req) => {
 }
 
 exports.sendEmail = (address, otp, user) => {
-console.log(address, otp, user)
+
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
-        sender: { email: "abdul@heliverse" },
+        sender: { email: "support@heliverse" },
         to: [
             {
                 email: address,
             },
         ],
-        subject: "Your One-Time-Password",
+        subject: "Email Verification",
     };
-    sendSmtpEmail.htmlContent = "<html><body><h1>Omnifi</h1>Please click on the below button to verify your email<br> <a  href={{params.link}} >Verify Email</a></body></html>";
+    sendSmtpEmail.htmlContent = "<html><body><style>   *{    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;} </style> <div style='    background: rgb(244, 247, 255); display: block;   margin: 10px auto;  max-width: 600px;  text-align: center;      padding:40px 20px;'>      <h1>Omnifi</h1>       <h4>     Please click on the below button to verify your email</h4>   <a style='padding: 10px;  background: #3498db;color: white;   border-radius: 5px;    text-decoration: none;'href='{{params.link}}'>Verify Email</a>   </div></body> </html>";
     sendSmtpEmail.params = { "otp": otp, link: 'http://localhost:3000/verify-otp/' + user.id + "/" + otp };
     apiInstance.sendTransacEmail(sendSmtpEmail).then(
         function (data) {
@@ -114,7 +114,7 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
-        sender: { email: "abdul@heliverse.com" },
+        sender: { email: "support@heliverse.com" },
         to: [
             {
                 email: address,
@@ -122,7 +122,7 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
         ],
         subject: "Reset Password",
     };
-    sendSmtpEmail.htmlContent = "<html><body><h1>Omnifi</h1>Please click on the below button to reset your password<br><a  href={{params.link}} >Reset password</a></body></html>";
+    sendSmtpEmail.htmlContent = "<html><body><style>   *{    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;} </style> <div style='    background: rgb(244, 247, 255); display: block;   margin: 10px auto;  max-width: 600px;  text-align: center;      padding:40px 20px;'>      <h1>Omnifi</h1>       <h3 margin:'20px 0px'  >     Please click on the below button to verify your email</h3>   <a style='padding: 10px;  background: #3498db;color: white;    border-radius: 5px;    text-decoration: none;'href='{{params.link}}'>Verify Email</a>   </div></body> </html>";
     sendSmtpEmail.params = { link: 'http://localhost:3000/reset-password/' + id + '/' + otp };
     apiInstance.sendTransacEmail(sendSmtpEmail).then(
         function (data) {
@@ -135,55 +135,106 @@ exports.sendEmailForgotpassword = (address, otp, id) => {
 
 
 }
-exports.AVERAGETIME = async (req, callback) => {
-
-    const date = new Date()
+exports.InterestCalculate = async (request, callback) => {
+    const { oldBalance, oldTime, oldInterest, newBalance, newTime, status } = request
     const CalculateInterest = (data) => {
+        const date = new Date()
+        const newdate = new Date(data.newTime)
         const olddate = new Date(data.oldTime); // 20th April 2021
-        const period = (date.getTime() - olddate.getTime()) / 1000;
+        const time = (newdate.getTime() - olddate.getTime()) / 1000;
         const principal = parseFloat(data.amount);
-        const time = period;
         const rate = 0.00000002536783358 // sec
         const interest = (principal * rate * time) / 100
-        
+
         return interest
     }
-    const interest = CalculateInterest(data = { amount: req.oldBalance, oldTime: req.oldTime })
+    switch (request.type) {
 
-    switch (req.status) {
 
         case "deposit": {
-           
-            const Total = parseFloat(req.newBalance) + parseFloat(req.oldBalance)
-            const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-            
-            Data = { balance: Total, last_transactions_time: date, id: req.id, interest: 0 }
-            callback(null, Data)
+
+            if (oldTime == null) {
+                const data = await { balance: request.newBalance, interest: 0, last_transactions_time: request.newTime }
+                callback(null, data)
+            }
+            else {
+
+                const interest = CalculateInterest(DATA = { amount: request.oldBalance, oldTime: request.oldTime, newTime: request.newTime })
+                const Total = parseFloat(request.newBalance) + parseFloat(request.oldBalance)
+                const Interest = parseFloat(interest) + parseFloat(request.oldInterest)
+                const data = await { balance: Total, interest: Interest, last_transactions_time: request.newTime }
+                callback(null, data)
+
+            }
 
             break;
-
         }
         case "withdraw": {
+            const interest = CalculateInterest(DATA = { amount: request.oldBalance, oldTime: request.oldTime, newTime: request.newTime })
+            const Total = parseFloat(request.oldBalance) - parseFloat(request.newBalance)
+            const Interest = parseFloat(interest) + parseFloat(request.oldInterest)
+            const data = await { balance: Total, interest: Interest, last_transactions_time: request.newTime }
 
-            if (req.oldBalance < req.newBalance) {
+            callback(null, data)
 
-                callback(null, err = { error: "you have no sufficient balance" })
-            } else {
-                const Total = parseFloat(req.oldBalance) - parseFloat(req.newBalance)
-                const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-
-                callback(null, data = { balance: req.oldBalance - req.newBalance, last_transactions_time: date, id: req.id, interest: Interest, status: req.status })
-            }
             break;
-        }
-        default: {
-
-            callback(null, err = { error: "not support" })
-
         }
 
     }
+
+
+
 }
+
+// exports.AVERAGETIME = async (req, callback) => {
+
+//     const date = new Date()
+// const CalculateInterest = (data) => {
+//     const olddate = new Date(data.oldTime); // 20th April 2021
+//     const period = (date.getTime() - olddate.getTime()) / 1000;
+//     const principal = parseFloat(data.amount);
+//     const time = period;
+//     const rate = 0.00000002536783358 // sec
+//     const interest = (principal * rate * time) / 100
+
+//     return interest
+// }
+//     const interest = CalculateInterest(data = { amount: req.oldBalance, oldTime: req.oldTime })
+
+//     switch (req.status) {
+
+//         case "deposit": {
+
+//             const Total = parseFloat(req.newBalance) + parseFloat(req.oldBalance)
+//             const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
+
+//             Data = { balance: Total, last_transactions_time: date, id: req.id, interest: 0 }
+//             callback(null, Data)
+
+//             break;
+
+//         }
+//         case "withdraw": {
+
+//             if (req.oldBalance < req.newBalance) {
+
+//                 callback(null, err = { error: "you have no sufficient balance" })
+//             } else {
+//                 const Total = parseFloat(req.oldBalance) - parseFloat(req.newBalance)
+//                 const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
+
+//                 callback(null, data = { balance: req.oldBalance - req.newBalance, last_transactions_time: date, id: req.id, interest: Interest, status: req.status })
+//             }
+//             break;
+//         }
+//         default: {
+
+//             callback(null, err = { error: "not support" })
+
+//         }
+
+//     }
+// }
 
 
 
@@ -191,12 +242,12 @@ exports.AVERAGETIME = async (req, callback) => {
 const Users = require("../model/user");
 const Transaction = require("../model/transaction");
 
-const getLastMonth =()=>{
+const getLastMonth = () => {
     var month = new Date().getMonth(); // January
     var d = new Date(2022, month + 1, 1);
     console.log(d.getTime());
     return d.getTime()
-    }
+}
 
 const InterestCalculate = (data) => {
     const date = new Date()

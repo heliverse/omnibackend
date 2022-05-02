@@ -19,7 +19,7 @@ router.use(urlencodedParser)
 // router.get("/auth/admin/transaction", auth, transaction.transaction)
 router.post("/admin/login", Admin.Login)
 
-router.post("/admin/auth/transaction/:user/:transaction",auth, Admin.updateTransaction)
+router.post("/admin/auth/transaction/",auth, Admin.updateTransaction)
 
 router.get("/admin/auth/getuser",auth, user.GetAllUser)
 

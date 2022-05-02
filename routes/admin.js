@@ -1,5 +1,5 @@
 const { generateOTP, generateAccessToken } = require("../config/main")
-const { getToken, decodeToken, AVERAGETIME } = require("../config/main");
+const { InterestCalculate } = require("../config/main");
 const Admin = require("../model/admin")
 const Users = require("../model/user")
 const Transaction = require("../model/transaction")
@@ -99,33 +99,81 @@ const transactionOneUser = async (req, res) => {
 
 const updateTransaction = async (req, res) => {
     try {
-        const {amount,status,time} =req.body
-        const { user, transaction } = req.params
-        Users.findByUserId(user, async (err, UserResults) => {
 
-            if (err) { res.json({ message: "user not find", status: true }) }
-            else {
-                if (UserResults.length > 0) {
+        const { transactionId, userId, balance, type, status, created } = req.body
+        const DATA = req.body
+        switch (DATA.status) {
+            case "accept": {
+                Users.findByUserId(DATA.userId, async (err, UserResults) => {
 
-console.log(UserResults)
-                }
+                    if (err) { res.json({ message: "user not find", status: true }) }
+                    else {
+                        if (UserResults.length > 0) {
+
+                            InterestCalculate(data = { oldBalance: UserResults[0].balance, oldTime: UserResults[0].last_transactions_time, oldInterest: UserResults[0].interest, newBalance: DATA.balance, newTime: DATA.created, type: DATA.type, status: DATA.status }, async (err, result) => {
+                                if (result) {
+                                    const data = { ...result, id: DATA.userId }
+                                    Users.update(data, async (err, result) => {
+                                        if (result.command == 'UPDATE' && result.rowCount == 1) {
+                                            Transaction.update(payload = { status: DATA.status, balance: DATA.balance, id: DATA.transactionId }, async (err, result) => {
+                                                if (result.command == "UPDATE" && result.rowCount == 1) {
+                                                    res.json({ message: "Transaction not Update ", status: true })
+                                                }else{
+
+                                                    res.json({ message: "Transaction Update Successfull", status: false })
+                                                }
+                                            })
+
+                                        }
 
 
+                                    })
+
+                                }
+
+
+                            })
+                        }
+                        else {
+                            res.json({ message: "user not found", status: false })
+                        }
+
+
+
+                    }
+
+
+                })
+
+                break;
+            }
+            case "reject": {
+
+                Transaction.update(payload = { status: DATA.status, balance: DATA.balance, id: DATA.transactionId }, async (err, result) => {
+                    if (result.command == "UPDATE" && result.rowCount == 1) {
+                        res.json({ message: "Transaction Update Successfull", status: true })
+                    }
+                    else{
+
+                        res.json({ message: "transaction not update ", status: false })
+                    }
+                })
+
+                break;
 
 
             }
-
-
-        })
+        }
 
 
 
 
     } catch (error) {
+        res.json({message:error,status:false})
 
     }
 }
 
 module.exports = { create, Login, updateTransaction, transactionOneUser }
 
-    //   module.exports = { create ,Login, transaction}
+  

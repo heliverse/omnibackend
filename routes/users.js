@@ -1,7 +1,7 @@
 const jwt_decode = require("jwt-decode");
 const bcrypt = require("bcrypt")
 const Google = require('../services/Google')
-const { Users, Transaction } = require("../model/model");
+const { Users} = require("../model/model");
 const { getToken, decodeToken, AVERAGETIME, generatePassword, generateOTP, generateAccessToken, sendEmail, sendEmailForgotpassword } = require("../config/main");
 
 
@@ -62,7 +62,7 @@ const Login = async (req, res) => {
           const match = await bcrypt.compare(password, result[0].password)
           if (match) {
             const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password, role: result[0].role_type })
-            res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
+            res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id,user_type: result[0].role_type})
           }
           else {
             res.json({ message: "Password  not match", status: false })
@@ -167,12 +167,10 @@ const verifyOtp = async (req, res) => {
     const { id, otp } = req.params
     const OTP =generateOTP()
     Users.findByUserId(id, (err, result) => {
-      console.log({result})
       if (err) return res.json({ message: err, status: false })
       if (result.length == 0) return res.json({ message: "User not found", status: false })
       if (result[0].status == true) return res.json({ message: "User already verified", status: true })
       if (result[0].authentication_key != otp) return res.json({ message: "Invalid OTP", status: false })
-      
       Users.updateStatus(id,OTP, (err, result) => {
         if (err) return res.json({ message: "Bad request", status: false })
         // console.log("-------", result, "-------")

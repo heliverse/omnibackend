@@ -11,7 +11,7 @@ const Users = function (user) {
     this.otp = user.otp;
     this.status = user.status
     this.interest = 0;
-    this.role_type = "admin"
+    this.role_type = "user"
 }
 
 Users.create = async (Data, callback) => {
@@ -85,15 +85,15 @@ Users.delete = (Email) => {
 
 
 Users.findByUserId = (Id, callback) => {
-    console.log(Id)
+
     connection.query("select id,firstname,lastname,role_type,email,balance,interest,last_transactions_time,authentication_key,status,is_confirmed from users where (id) = ($1) ", [Id], (error, result) => {
         if (error) {
-        
+
             callback(error, null)
 
         }
         else {
-            
+
             callback(null, result.rows)
 
         }
@@ -127,9 +127,9 @@ Users.updateOTP = (data, callback) => {
 
 
 
-Users.updateStatus = (Id,otp, callback) => {
+Users.updateStatus = (Id, otp, callback) => {
 
-    connection.query("update users set status = ($3), authentication_key=($2) where id = ($1)", [Id,otp,true], (err, result) => {
+    connection.query("update users set status = ($3), authentication_key=($2) where id = ($1)", [Id, otp, true], (err, result) => {
         if (err) {
 
             callback(null, err)
@@ -182,11 +182,13 @@ Users.updatePassword = async (Id, pass, callback) => {
 Users.update = (data, callback) => {
 
     connection.query("UPDATE users SET balance=($2),last_transactions_time=($3),interest=($4) WHERE (id)=($1)", [data.id, data.balance, data.last_transactions_time, data.interest], (error, result) => {
-        console.log(data, result)
+
         if (error) {
             callback(error, null)
 
+
         } else {
+
             callback(null, result)
 
         }

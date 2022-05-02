@@ -7,12 +7,14 @@ const { getToken, decodeToken, AVERAGETIME } = require("../config/main");
 const createTransaction = async (req, res) => {
 
   try {
+
     const data = await new Transaction(req.body)
+
     const token = await getToken(req)
     const TokenData = decodeToken(token)
     data.user = TokenData.user.userId
 
-    switch (req.body.type) {
+    switch (req.body.status) {
       case "deposit": {
         Transaction.add(data, function (err, result) {
           if (err) {
@@ -39,10 +41,10 @@ const createTransaction = async (req, res) => {
         Users.findByUserId(TokenData.user.userId, async (err, result) => {
           if (err) {
             res.json({ message: err, status: false })
-          } 
+          }
           else {
             if (result.length > 0) {
-             
+
               if (result[0].balance < req.body.amount) {
                 res.json({ message: "you have no sufficient balance", status: false })
               }
@@ -71,6 +73,7 @@ const createTransaction = async (req, res) => {
             }
           }
         })
+        
         break;
       }
 
