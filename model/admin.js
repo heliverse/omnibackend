@@ -25,11 +25,18 @@ Admin.create = async (Data, callback) => {
         }
     })
 }
-Admin.findUsers =async(Data,callback)=>{
-    connection.query(`select users.id,users.firstname,users.lastname,users.email,transactions.status from users inner join transactions on users.id=transactions.user_id
 
-    `)
+
+Admin.findTransaction =async (Data,callback)=>{
+    console.log(Data)
+connection.query('select users.firstname,users.lastname,transactions.id,transactions.status,transactions.transaction_type,transactions.amount,transactions.user_id from users inner join transactions on users.id=transactions.user_id where users.id=($1)',[Data],(error,result)=>{
+    if (error) {
+        callback(error, null)
+    }
+    else {
+
+        callback(null, result)
+    }
+})
 }
-
-
 module.exports = Admin

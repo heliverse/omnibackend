@@ -77,12 +77,13 @@ const Login = async (req, res) => {
 const transactionOneUser = async (req, res) => {
     try {
         const id = req.query.id
-        Transaction.findByUserId(id, async function (err, result) {
+
+        Admin.findTransaction(id, async function (err, result) {
             if (err) {
                 res.json({ message: err, status: false })
             }
             else {
-                res.send({ data: result, status: true })
+                res.send({ data: result.rows, status: true })
 
             }
         })
