@@ -25,6 +25,11 @@ Admin.create = async (Data, callback) => {
         }
     })
 }
+Admin.findUsers =async(Data,callback)=>{
+    connection.query(`select users.id,users.firstname,users.lastname,users.email,transactions.status from users inner join transactions on users.id=transactions.user_id
+
+    `)
+}
 
 
 module.exports = Admin
