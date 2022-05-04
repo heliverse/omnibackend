@@ -187,55 +187,6 @@ exports.InterestCalculate = async (request, callback) => {
 
 }
 
-// exports.AVERAGETIME = async (req, callback) => {
-
-//     const date = new Date()
-// const CalculateInterest = (data) => {
-//     const olddate = new Date(data.oldTime); // 20th April 2021
-//     const period = (date.getTime() - olddate.getTime()) / 1000;
-//     const principal = parseFloat(data.amount);
-//     const time = period;
-//     const rate = 0.00000002536783358 // sec
-//     const interest = (principal * rate * time) / 100
-
-//     return interest
-// }
-//     const interest = CalculateInterest(data = { amount: req.oldBalance, oldTime: req.oldTime })
-
-//     switch (req.status) {
-
-//         case "deposit": {
-
-//             const Total = parseFloat(req.newBalance) + parseFloat(req.oldBalance)
-//             const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-
-//             Data = { balance: Total, last_transactions_time: date, id: req.id, interest: 0 }
-//             callback(null, Data)
-
-//             break;
-
-//         }
-//         case "withdraw": {
-
-//             if (req.oldBalance < req.newBalance) {
-
-//                 callback(null, err = { error: "you have no sufficient balance" })
-//             } else {
-//                 const Total = parseFloat(req.oldBalance) - parseFloat(req.newBalance)
-//                 const Interest = parseFloat(interest) + parseFloat(req.oldInterest)
-
-//                 callback(null, data = { balance: req.oldBalance - req.newBalance, last_transactions_time: date, id: req.id, interest: Interest, status: req.status })
-//             }
-//             break;
-//         }
-//         default: {
-
-//             callback(null, err = { error: "not support" })
-
-//         }
-
-//     }
-// }
 
 
 
@@ -277,7 +228,7 @@ exports.monthlyInterest = async () => {
             for (i = 0; i < UserResult.length; i++) {
                 console.log(UserResult[i])
                 const interest = await InterestCalculate(data = { id: UserResult[i].id, balance: UserResult[i].balance, oldTime: UserResult[i].last_transactions_time, oldInterest: UserResult[i].interest })
-                Transaction.add(data = { user: UserResult[i].id, amount: interest.interest, status: "deposit" }, async (err, result) => {
+                Transaction.add(data = { user: UserResult[i].id, amount: interest.interest, transaction_type: "deposit" ,status:"accept" }, async (err, result) => {
                     if (result) {
                         const date = new Date()
                         Users.update(data = { id: interest.id, balance: interest.balance, interest: 0, last_transactions_time: date }, async function (err, result) {

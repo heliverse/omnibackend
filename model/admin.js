@@ -29,7 +29,7 @@ Admin.create = async (Data, callback) => {
 
 Admin.findTransaction =async (Data,callback)=>{
     console.log(Data)
-connection.query('select users.firstname,users.lastname,transactions.id,transactions.status,transactions.transaction_type,transactions.amount,transactions.user_id,transactions.created from users inner join transactions on users.id=transactions.user_id where users.id=($1)',[Data],(error,result)=>{
+connection.query('select users.firstname,users.lastname,transactions.id,transactions.status,transactions.transaction_type,transactions.amount,transactions.user_id,transactions.created from users inner join transactions on users.id=transactions.user_id where users.id=($1) ORDER BY id DESC ',[Data],(error,result)=>{
     if (error) {
         callback(error, null)
     }
