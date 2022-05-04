@@ -234,10 +234,10 @@ const updateTransaction = async (req, res) => {
                                         if (result.command == 'UPDATE' && result.rowCount == 1) {
                                             Transaction.update(payload = { status: DATA.status, balance: DATA.balance, id: DATA.transactionId }, async (err, result) => {
                                                 if (result.command == "UPDATE" && result.rowCount == 1) {
-                                                    res.json({ message: "Transaction not Update ", status: true })
+                                                    res.json({ message: "Transaction Update Successfull", status: true })
                                                 } else {
 
-                                                    res.json({ message: "Transaction Update Successfull", status: false })
+                                                    res.json({ message: "Transaction not Update", status: false })
                                                 }
                                             })
 

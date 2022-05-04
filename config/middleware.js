@@ -15,7 +15,9 @@ const auth = async (req, res, next) => {
         if (token) {
             const TokenData = await decodeToken(token)
             const { email, role } = TokenData.user
+            console.log(email,role)
             switch (role) {
+
                 case "admin": {
                     Users.findByEmail(email, async function (err, result) {
                         if (err) {
@@ -34,15 +36,22 @@ const auth = async (req, res, next) => {
                 case "user": {
                     Users.findByEmail(email, async function (err, result) {
                         if (err) {
+                            console.log(err)
                             res.send(err)
+
                         }
-                        if (result.length > 0 && result[0].role_type == "user") {
+                        else{
+                            console.log({result})
+                            if (result.length > 0 && result[0].role_type == "user") {
                  
-                             next()
+                                next()
+                           }
+                           else {
+                               console.log(result)
+                            //    res.status(400).json({ message: "unauthorize access", status: false })
+                           }
                         }
-                        else {
-                            res.status(400).json({ message: "unauthorize access", status: false })
-                        }
+                 
                     })
                     break;
                 }

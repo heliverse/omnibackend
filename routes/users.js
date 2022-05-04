@@ -304,7 +304,7 @@ const getAccessToken = async (req, res) => {
       if (err) { res.json({ message: err, status: false }) }
       else {
         if (result.length > 0) {
-          const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
+          const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password, })
           res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
 
         }
@@ -316,7 +316,8 @@ const getAccessToken = async (req, res) => {
               Users.findByEmail(googleData.email, async (err, result) => {
                 if (err) { res.send({ message: "something went wrong" }) }
                 if (result.length > 0) {
-                  const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password })
+                  console.log(result)
+                  const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password , role: result[0].role_type })
                   res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
                 }
 
