@@ -27,7 +27,7 @@ router.get("/admin/auth/getuser",auth, user.GetAllUser)
 // router.get("/admin/auth/getuser",auth, user.GetOneUser)
 
 router.get("/admin/auth/transaction", auth, Admin.transactionOneUser)
-
+router.get("/admin/auth/getnotification", auth, Admin.getnotification)
 
 
 

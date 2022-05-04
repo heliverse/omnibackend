@@ -291,5 +291,18 @@ const updateTransaction = async (req, res) => {
     }
 }
 
-module.exports = { create, Login, updateTransaction, transactionOneUser, createTransacction }
+const getnotification= async (req,res)=>{
+
+
+Admin.count(data="awaiting", async (err,result)=>{
+    if(err){
+        res.json({message:err,status:false})
+    }
+    else{
+        res.json({data:result,status:true})
+    }
+})
+
+}
+module.exports = { create, Login, updateTransaction, transactionOneUser, createTransacction , getnotification}
 

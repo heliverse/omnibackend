@@ -15,7 +15,7 @@ const Admin = function (Admin) {
 
 Admin.create = async (Data, callback) => {
     const password = await generatePassword(Data.password)
-    connection.query('INSERT INTO Admin (firstname,lastname,email,password,status,is_authenticated) VALUES ($1, $2, $3, $4,$5,$6) RETURNING id,email,password', [Data.firstname, Data.lastname, Data.email, password, Data.status,true], (error, result) => {
+    connection.query('INSERT INTO Admin (firstname,lastname,email,password,status,is_authenticated) VALUES ($1, $2, $3, $4,$5,$6) RETURNING id,email,password', [Data.firstname, Data.lastname, Data.email, password, Data.status, true], (error, result) => {
         if (error) {
             callback(error, null)
         }
@@ -27,16 +27,29 @@ Admin.create = async (Data, callback) => {
 }
 
 
-Admin.findTransaction =async (Data,callback)=>{
+Admin.findTransaction = async (Data, callback) => {
     console.log(Data)
-connection.query('select users.firstname,users.lastname,transactions.id,transactions.status,transactions.transaction_type,transactions.amount,transactions.user_id,transactions.created from users inner join transactions on users.id=transactions.user_id where users.id=($1) ORDER BY id DESC ',[Data],(error,result)=>{
-    if (error) {
-        callback(error, null)
-    }
-    else {
+    connection.query('select users.firstname,users.lastname,transactions.id,transactions.status,transactions.transaction_type,transactions.amount,transactions.user_id,transactions.created from users inner join transactions on users.id=transactions.user_id where users.id=($1) ', [Data], (error, result) => {
+        if (error) {
+            callback(error, null)
+        }
+        else {
 
-        callback(null, result)
-    }
-})
+            callback(null, result)
+        }
+    })
+}
+
+
+Admin.count = async (Data,callback)=>{
+    connection.query('select count(id) from transactions where transactions.status =($1)', [Data], (error, result) => {
+        if (error) {
+            callback(error, null)
+        }
+        else {
+
+            callback(null, result.rows)
+        }
+    })
 }
 module.exports = Admin
