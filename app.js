@@ -41,5 +41,5 @@ app.use("/", Router)
 
 
 app.listen(port, () => {
-  console.log("i m on")
+  console.log("i m on", port)
 })
