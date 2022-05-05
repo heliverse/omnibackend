@@ -16,8 +16,8 @@ jobs:
         id: ssm
         with:
           aws-region: us-east-1
-          aws-access-key-id: AKIAXU3KGQZWM2RVM6N5
-          aws-secret-access-key: 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
+          aws-access-key-id: AKIAXU3KGQZWO3V5VEOX
+          aws-secret-access-key: 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
           instance-ids: i-0dc9e66342a1f8f1a
           comment: Deploy the master branch
           working-directory: /home/ubuntu/omnibackend
