@@ -19,5 +19,5 @@ jobs:
           aws-region: us-east-1
           instance-ids: ${{ secrets.INSTANCE_ID  }}
           comment: Deploy the master branch
-          working-directory: /home/ubuntu/<YOUR PROJECT DIRECTORY>
+          working-directory: /home/ubuntu/omnibackend
           command: /bin/sh ./deploy.sh
