@@ -100,6 +100,7 @@ const transactionOneUser = async (req, res) => {
 
 const createTransacction = async (req, res) => {
 
+    const DATA = req.body
 
     try {
         const DATA = req.body
@@ -111,7 +112,7 @@ const createTransacction = async (req, res) => {
                     else {
                         if (UserResults.length > 0) {
 
-                            InterestCalculate(data = { oldBalance: UserResults[0].balance, oldTime: UserResults[0].last_transactions_time, oldInterest: UserResults[0].interest, newBalance: DATA.balance, newTime: new Date(), type: DATA.type }, async (err, RESULT) => {
+                            InterestCalculate(data = { oldBalance: UserResults[0].balance, oldTime: UserResults[0].last_transactions_time, oldInterest: UserResults[0].interest, newBalance: DATA.balance, newTime: DATA.created, type: DATA.type }, async (err, RESULT) => {
                                 Users.update(data = { id: UserResults[0].id, balance: RESULT.balance, last_transactions_time: RESULT.last_transactions_time, interest: RESULT.interest }, async (err, result) => {
 
                                     if (result) {
@@ -161,7 +162,7 @@ const createTransacction = async (req, res) => {
                                 res.json({ message: "you have no sufficient balance", status: false })
                             }
                             else {
-                                InterestCalculate(data = { oldBalance: UserResults[0].balance, oldTime: UserResults[0].last_transactions_time, oldInterest: UserResults[0].interest, newBalance: DATA.balance, newTime: new Date(), type: DATA.type }, async (err, RESULT) => {
+                                InterestCalculate(data = { oldBalance: UserResults[0].balance, oldTime: UserResults[0].last_transactions_time, oldInterest: UserResults[0].interest, newBalance: DATA.balance, newTime:DATA.created, type: DATA.type }, async (err, RESULT) => {
                                     Users.update(data = { id: UserResults[0].id, balance: RESULT.balance, last_transactions_time: RESULT.last_transactions_time, interest: RESULT.interest }, async (err, result) => {
 
                                         if (result) {

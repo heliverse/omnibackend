@@ -112,7 +112,7 @@ Users.findByUserId = (Id, callback) => {
 
 Users.updateOTP = (data, callback) => {
 
-    connection.query("update users set is_confirmed=($3), authentication_key=($2) where id = ($1)", [data.userId, data.otp, data.status], (err, result) => {
+    connection.query("update users set is_confirmed=($3), authentication_key=($2) where id = ($1)", [data.id, data.otp, data.status], (err, result) => {
         if (err) {
 
             callback(null, err)

@@ -36,6 +36,6 @@ app.use("/", Router)
 
 
 
-app.listen(port, () => {
+app.listen(`${process.env.port}`, () => {
   console.log("i m on")
 })

@@ -1,5 +1,6 @@
 var SibApiV3Sdk = require("sib-api-v3-sdk");
 const jwt = require('jsonwebtoken')
+require('dotenv').config();
 const bcrypt = require("bcrypt")
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 const secretKey = process.env.SECRET_KEY
@@ -24,11 +25,6 @@ exports.decodeToken = (token) => {
 
 }
 
-// exports.generateRefreshToken = (user) => {
-//     const payload = {user}
-//     const refreshToken = jwt.sign(payload,jwtConfig.refreshTokenSecret,{expiresIn: jwtConfig.refreshTokenExpireTime})
-//     return refreshToken
-// }
 
 exports.verifyJWTToken = (token) => {
     const data = jwt.verify(token, jwtConfig.secret)
@@ -54,19 +50,7 @@ exports.generateOTP = () => {
     }
     return OTP;
 }
-// const SecurePassword = async(payload,callback)=>{
 
-// const salt = bcrypt.genSaltSync(10)
-// console.log(salt)
-
-// var password = await bcrypt.hashSync(payload,salt)
-// callback(null,password)
-// console.log(password)
-
-// }
-// module.exports={
-//     SecurePassword
-// }
 exports.getToken = async (req) => {
 
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') { // Authorization: Bearer g1jipjgi1ifjioj
@@ -79,8 +63,7 @@ exports.getToken = async (req) => {
         // Handle token presented as a cookie parameter
         return req.cookies.token;
     }
-    // If we return null, we couldn't find a token.
-    // In this case, the JWT middleware will return a 401 (unauthorized) to the client for this request
+
     return null;
 }
 
@@ -89,7 +72,7 @@ exports.sendEmail = (address, otp, user) => {
     var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
     sendSmtpEmail = {
-        sender: { email: "support@heliverse" },
+        sender: { email: `${process.env.SENDNBLUE_ADMIN_EMAIL}` },
         to: [
             {
                 email: address,
@@ -98,7 +81,7 @@ exports.sendEmail = (address, otp, user) => {
         subject: "Email Verification",
     };
     sendSmtpEmail.htmlContent = "<html><body><style>   *{    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;} </style> <div style='    background: rgb(244, 247, 255); display: block;   margin: 10px auto;  max-width: 600px;  text-align: center;      padding:40px 20px;'>      <h1>Omnifi</h1>       <h4>     Please click on the below button to verify your email</h4>   <a style='padding: 10px;  background: #3498db;color: white;   border-radius: 5px;    text-decoration: none;'href='{{params.link}}'>Verify Email</a>   </div></body> </html>";
-    sendSmtpEmail.params = { "otp": otp, link: 'http://localhost:3000/verify-otp/' + user.id + "/" + otp };
+    sendSmtpEmail.params = { "otp": otp, link: `${process.env.CLIENT_URL}/verify-otp/` + user.id + "/" + otp };
     apiInstance.sendTransacEmail(sendSmtpEmail).then(
         function (data) {
             // console.log("API called successfully. Returned data: " + data);
@@ -109,29 +92,60 @@ exports.sendEmail = (address, otp, user) => {
     );
 }
 
-exports.sendEmailForgotpassword = (address, otp, id) => {
+exports.sendEmailForgotpassword = (address, otp, id, role_type) => {
 
-    var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-    var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
-    sendSmtpEmail = {
-        sender: { email: "support@heliverse.com" },
-        to: [
-            {
-                email: address,
-            },
-        ],
-        subject: "Reset Password",
-    };
-    sendSmtpEmail.htmlContent = "<html><body><style>   *{    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;} </style> <div style='    background: rgb(244, 247, 255); display: block;   margin: 10px auto;  max-width: 600px;  text-align: center;      padding:40px 20px;'>      <h1>Omnifi</h1>       <h3 margin:'20px 0px'  >     Please click on the below button to verify your email</h3>   <a style='padding: 10px;  background: #3498db;color: white;    border-radius: 5px;    text-decoration: none;'href='{{params.link}}'>Verify Email</a>   </div></body> </html>";
-    sendSmtpEmail.params = { link: 'http://localhost:3000/reset-password/' + id + '/' + otp };
-    apiInstance.sendTransacEmail(sendSmtpEmail).then(
-        function (data) {
+    switch (role_type) {
 
-        },
-        function (error) {
-            console.error(error);
+        case "user": {
+            var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+            var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
+            sendSmtpEmail = {
+                sender: { email: "support@heliverse.com" },
+                to: [
+                    {
+                        email: address,
+                    },
+                ],
+                subject: "Reset Password",
+            };
+            sendSmtpEmail.htmlContent = "<html><body><style>   *{    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;} </style> <div style='    background: rgb(244, 247, 255); display: block;   margin: 10px auto;  max-width: 600px;  text-align: center;      padding:40px 20px;'>      <h1>Omnifi</h1>       <h3 margin:'20px 0px'  >     Please click on the below button to verify your email</h3>   <a style='padding: 10px;  background: #3498db;color: white;    border-radius: 5px;    text-decoration: none;'href='{{params.link}}'>Verify Email</a>   </div></body> </html>";
+            sendSmtpEmail.params = { link: `${process.env.CLIENT_URL}/reset-password/` + id + '/' + otp };
+            apiInstance.sendTransacEmail(sendSmtpEmail).then(
+                function (data) {
+
+                },
+                function (error) {
+                    console.error(error);
+                }
+            );
+            break;
         }
-    );
+        case "admin": {
+            var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+            var sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail(); // SendSmtpEmail | Values to send a transactional email
+            sendSmtpEmail = {
+                sender: { email: "support@heliverse.com" },
+                to: [
+                    {
+                        email: address,
+                    },
+                ],
+                subject: "Reset Password",
+            };
+            sendSmtpEmail.htmlContent = "<html><body><style>   *{    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;} </style> <div style='    background: rgb(244, 247, 255); display: block;   margin: 10px auto;  max-width: 600px;  text-align: center;      padding:40px 20px;'>      <h1>Omnifi</h1>       <h3 margin:'20px 0px'  >     Please click on the below button to verify your email</h3>   <a style='padding: 10px;  background: #3498db;color: white;    border-radius: 5px;    text-decoration: none;'href='{{params.link}}'>Verify Email</a>   </div></body> </html>";
+            sendSmtpEmail.params = { link: `${process.env.ADMIN_URL}/reset-password/` + id + '/' + otp };
+            apiInstance.sendTransacEmail(sendSmtpEmail).then(
+                function (data) {
+
+                },
+                function (error) {
+                    console.error(error);
+                }
+            );
+            break;
+        }
+
+    }
 
 
 }
@@ -163,7 +177,7 @@ exports.InterestCalculate = async (request, callback) => {
                 const Total = parseFloat(request.newBalance) + parseFloat(request.oldBalance)
                 const Interest = parseFloat(interest) + parseFloat(request.oldInterest)
                 const data = await { balance: Total, interest: Interest, last_transactions_time: request.newTime }
-                
+
                 callback(null, data)
 
             }
@@ -228,7 +242,7 @@ exports.monthlyInterest = async () => {
             for (i = 0; i < UserResult.length; i++) {
                 console.log(UserResult[i])
                 const interest = await InterestCalculate(data = { id: UserResult[i].id, balance: UserResult[i].balance, oldTime: UserResult[i].last_transactions_time, oldInterest: UserResult[i].interest })
-                Transaction.add(data = { user: UserResult[i].id, amount: interest.interest, transaction_type: "deposit" ,status:"accept" }, async (err, result) => {
+                Transaction.add(data = { user: UserResult[i].id, amount: interest.interest, transaction_type: "deposit", status: "accept" }, async (err, result) => {
                     if (result) {
                         const date = new Date()
                         Users.update(data = { id: interest.id, balance: interest.balance, interest: 0, last_transactions_time: date }, async function (err, result) {

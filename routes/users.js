@@ -204,10 +204,11 @@ const forgotPassword = async (req, res) => {
       else {
         let otp = await generateOTP();
         // otp = await generatePassword(otp)
-        const userId = result[0].id;
+        const {id,role_type} = result[0];
+        console.log(id,role_type)
 
-        Users.updateOTP(data = { otp, userId, status: true }, async function (err, result) {
-          sendEmailForgotpassword(EMAIL, otp, userId)
+        Users.updateOTP(data = { otp, id, status: true }, async function (err, result) {
+          sendEmailForgotpassword(EMAIL, otp, id,role_type)
           res.json({ message: "Check your email", status: true })
         })
 
