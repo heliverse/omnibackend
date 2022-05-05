@@ -1,4 +1,4 @@
-name: Build and deploy omnifi-backend to EC2 with CI/CD - omnifi
+name: Build and deploy omnifi-backend to EC2 with CI/CD - omnifi 
 
 on:
   push:
