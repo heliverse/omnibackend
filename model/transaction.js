@@ -16,7 +16,7 @@ let Transaction = function (transaction) {
 
 
 Transaction.add = (Data, callback) => {
-    console.log(Data)
+   
     connection.query('INSERT INTO transactions (user_id,amount,transaction_type,status) VALUES ($1,$2,$3,$4)', [Data.user, Data.amount, Data.transaction_type, Data.status], (error, result) => {
         if (error) {
             callback(error, null)

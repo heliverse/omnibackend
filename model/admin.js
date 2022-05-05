@@ -28,7 +28,7 @@ Admin.create = async (Data, callback) => {
 
 
 Admin.findTransaction = async (Data, callback) => {
-    console.log(Data)
+ 
     connection.query('select users.firstname,users.lastname,transactions.id,transactions.status,transactions.transaction_type,transactions.amount,transactions.user_id,transactions.created from users inner join transactions on users.id=transactions.user_id where users.id=($1) ', [Data], (error, result) => {
         if (error) {
             callback(error, null)
@@ -43,6 +43,18 @@ Admin.findTransaction = async (Data, callback) => {
 
 Admin.count = async (Data,callback)=>{
     connection.query('select count(id) from transactions where transactions.status =($1)', [Data], (error, result) => {
+        if (error) {
+            callback(error, null)
+        }
+        else {
+
+            callback(null, result.rows)
+        }
+    })
+}
+
+Admin.NewTransaction = async (Data,callback)=>{
+    connection.query('select * from transactions where transactions.status =($1)', [Data], (error, result) => {
         if (error) {
             callback(error, null)
         }
