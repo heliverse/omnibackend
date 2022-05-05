@@ -7,6 +7,10 @@ let Router = require('./routes/index');
 let app = express();
 const session = require('express-session');
 const port = process.env.port
+
+app.set('port', port);
+
+module.exports = app;
 //middleware
 app.use(cors())
 // app.set('view engine', 'ejs');
