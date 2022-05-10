@@ -1,9 +1,9 @@
-name: Build and deploy omnifi-backend to EC2 with CI/CD - omnifi
+name: Build and deploy omnifi-backend to EC2 with CI/CD - omnifi 
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+    
 jobs:
   start:
     runs-on: ubuntu-latest
@@ -12,12 +12,17 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: AWS SSM Send Command
-        uses: peterkimzz/aws-ssm-send-command@1.0.1
+        uses: peterkimzz/aws-ssm-send-command@master
+        id: ssm
         with:
+          aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID  }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY  }}
-          aws-region: us-east-1
           instance-ids: ${{ secrets.INSTANCE_ID  }}
           comment: Deploy the master branch
           working-directory: /home/ubuntu/omnibackend
           command: /bin/sh ./deploy.sh
+          
+          # Catch SSM outputs
+      - name: Get the outputs
+        run: echo "The Command id is ${{ steps.ssm.outputs.command-id }}"
