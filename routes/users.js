@@ -204,12 +204,20 @@ const forgotPassword = async (req, res) => {
       else {
         let otp = await generateOTP();
         // otp = await generatePassword(otp)
-        const {id,role_type} = result[0];
-        console.log(id,role_type)
+        const { id, role_type } = result[0];
+        console.log(id, role_type)
 
         Users.updateOTP(data = { otp, id, status: true }, async function (err, result) {
-          sendEmailForgotpassword(EMAIL, otp, id,role_type)
-          res.json({ message: "Check your email", status: true })
+          sendEmailForgotpassword(EMAIL, otp, id, role_type, async function (error, result) {
+            if (error) {
+              res.json({ message: "Service not working", status: true })
+            }
+            else {
+              if (result) {
+                res.json({ message: "Check your email", status: true })
+              }
+            }
+          })
         })
 
       }
@@ -318,7 +326,7 @@ const getAccessToken = async (req, res) => {
                 if (err) { res.send({ message: "something went wrong" }) }
                 if (result.length > 0) {
                   console.log(result)
-                  const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password , role: result[0].role_type })
+                  const accessToken = await generateAccessToken({ userId: result[0].id, email: result[0].email, password: result[0].password, role: result[0].role_type })
                   res.json({ message: "Login successfully done", status: true, token: accessToken, id: result[0].id })
                 }
 

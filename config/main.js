@@ -92,7 +92,7 @@ exports.sendEmail = (address, otp, user) => {
     );
 }
 
-exports.sendEmailForgotpassword = (address, otp, id, role_type) => {
+exports.sendEmailForgotpassword = async(address, otp, id, role_type,callback) => {
 
     switch (role_type) {
 
@@ -115,7 +115,8 @@ exports.sendEmailForgotpassword = (address, otp, id, role_type) => {
 
                 },
                 function (error) {
-                    console.error(error);
+                    callback(error,null)
+                   
                 }
             );
             break;
@@ -139,7 +140,8 @@ exports.sendEmailForgotpassword = (address, otp, id, role_type) => {
 
                 },
                 function (error) {
-                    console.error(error);
+                    callback(error,null)
+                    
                 }
             );
             break;
